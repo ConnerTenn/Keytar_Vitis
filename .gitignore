@@ -1,0 +1,9 @@
+#Directories
+/.metadata/
+
+#File Types
+*.log
+*.o
+
+#Files
+.analytics
