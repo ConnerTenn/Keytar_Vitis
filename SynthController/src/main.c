@@ -3,7 +3,7 @@
 * Hello World program using XUartPs driver in polled mode
 *
 * The example uses the default setting in the XUartPs driver:
-*	. baud rate 9600
+*	. baud rate 115200
 *	. 8 bit data
 *	. 1 stop bit
 *	. no parity
@@ -30,7 +30,7 @@ int InitUart(u16 DeviceId)
     //Look up the configuration in the config table and then initialize it.
     XUartPs_Config *Config = XUartPs_LookupConfig(DeviceId);
     if (Config == NULL) { return XST_FAILURE; }
-    
+
     XUartPs Uart_Ps; //The instance of the UART Driver
     status = XUartPs_CfgInitialize(&Uart_Ps, Config, Config->BaseAddress);
     if (status != XST_SUCCESS) { return XST_FAILURE; }
@@ -47,7 +47,7 @@ int main()
     int status;
     status = InitUart(UART_DEVICE_ID);
 
-    if (status != XST_SUCCESS) 
+    if (status != XST_SUCCESS)
     {
         xil_printf("Uartps hello world Example Failed\r\n");
         return XST_FAILURE;
@@ -60,7 +60,7 @@ int main()
         xil_printf("Hello World! %lu\n", count++);
     }
 
-    return XST_SUCCESS;
+    return 0;
 }
 
 
