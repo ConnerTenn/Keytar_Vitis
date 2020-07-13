@@ -1,9 +1,18 @@
-#Directories
+#== Directories ==
 /.metadata/
 
-#File Types
+#== File Types ==
+#reports
 *.log
+#metadata
+#hardwarefiles
+*.bit
+*.xsa
+#output files
+*.elf
+#objectfiles
 *.o
+*.a
 
-#Files
+#== Files ==
 .analytics
