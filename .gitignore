@@ -11,6 +11,7 @@
 *.xsa
 #output files
 *.elf
+*.size
 *.d
 #objectfiles
 *.o
@@ -18,4 +19,3 @@
 
 #== Files ==
 .analytics
-*.size
