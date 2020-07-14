@@ -113,6 +113,7 @@
 #include "xstatus.h"
 #include "fsbl_hooks.h"
 #include "xtime_l.h"
+#include "sleep.h"
 
 #ifdef XPAR_XWDTPS_0_BASEADDR
 #include "xwdtps.h"
@@ -263,6 +264,7 @@ int main(void)
 	 */
 	RegisterHandlers();
 	
+	sleep(3);
 	/*
 	 * Print the FSBL Banner
 	 */
