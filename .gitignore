@@ -1,3 +1,4 @@
+
 #== Directories ==
 /.metadata/
 
@@ -10,9 +11,11 @@
 *.xsa
 #output files
 *.elf
+*.d
 #objectfiles
 *.o
 *.a
 
 #== Files ==
 .analytics
+*.size
