@@ -34,7 +34,7 @@
 
 #define sev() __asm__("sev")
 #define CPU1STARTADR 0xfffffff0
-#define CPU1IMAGEADR 0x00200000
+#define CPU1IMAGEADR 0x02000000
 
 int InitCPU1()
 {
