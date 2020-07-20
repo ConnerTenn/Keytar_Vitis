@@ -21,28 +21,30 @@
 
 #include "sleep.h"
 
-#include "xuartps.h"
-#include "xil_printf.h"
-
-#define UART_DEVICE_ID  XPAR_XUARTPS_0_DEVICE_ID
 
 
+int Init()
+{
+    //Disable cache on OCM
+    Xil_SetTlbAttributes(SHARED_ADDR,0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
+
+    return XST_SUCCESS;
+}
 
 int main()
 {
-    uint32_t *buzzer = (uint32_t *)0x40000000;
-
-    //Disable cache on OCM
-    Xil_SetTlbAttributes(0xFFFF0000,0x14de2);           // S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
-
     PRINT("CPU1: Start!\n");
 
+    if (Init() != XST_SUCCESS)
+    {
+        PRINT("CPU1: Init Failed\n");
+        return XST_FAILURE;
+    }
 
     uint32_t count = 0;
     while (1)
     {
         xil_printf("CPU1: %lu\n", count++);
-        *buzzer = count*2;
         usleep(500*1000); //500ms
 
     }

@@ -24,23 +24,19 @@
 
 #include "sleep.h"
 
-#include "xuartps.h"
-#include "xil_printf.h"
-
 #include "synth.h"
 
 
-#define UART_DEVICE_ID  XPAR_XUARTPS_0_DEVICE_ID
 
 #define sev() __asm__("sev")
-#define CPU1STARTADR 0xfffffff0
+#define CPU1STARTADDRREG 0xfffffff0
 #define CPU1IMAGEADR 0x02000000
 
 int InitCPU1()
 {
     print("CPU0: writing startaddress for CPU1\n\r");
-    Xil_Out32(CPU1STARTADR, CPU1IMAGEADR);
-    dmb();
+    Xil_Out32(CPU1STARTADDRREG, CPU1IMAGEADR);
+    dmb(); //Wait for write to complete
 
     print("CPU0: sending the SEV to wake up CPU1\n\r");
     sev();
@@ -69,32 +65,34 @@ int InitUart(u16 DeviceId)
     return XST_SUCCESS;
 }
 
+int Init()
+{
+    //Disable cache on OCM
+    Xil_SetTlbAttributes(SHARED_ADDR, 0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
+
+    if (InitUart(XPAR_XUARTPS_0_DEVICE_ID) != XST_SUCCESS)
+    {
+        PRINT("CPU0: Failed to initialize UART\n");
+        return XST_FAILURE;
+    }
+
+    if (InitCPU1() != XST_SUCCESS)
+    {
+        PRINT("CPU0: Filed to initialize CPU 1\n");
+        return XST_FAILURE;
+    }
+
+    return XST_SUCCESS;
+}
+
 
 int main()
 {
-    int status;
-
-    status = InitUart(UART_DEVICE_ID);
-    if (status != XST_SUCCESS)
+    if (Init() != XST_SUCCESS)
     {
-        PRINT("Uartps hello world Example Failed\n");
+        PRINT("CPU0: Init Failed\n");
         return XST_FAILURE;
     }
-
-
-    //Disable cache on OCM
-    Xil_SetTlbAttributes(0xFFFF0000,0x14de2);           // S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
-
-    
-    status = InitCPU1();
-    if (status != XST_SUCCESS)
-    {
-        PRINT("Filed to initialize CPU 1\n");
-        return XST_FAILURE;
-    }
-
-    usleep(1000);
-
 
     uint32_t count = 0;
     while (1)
@@ -104,7 +102,7 @@ int main()
         usleep(500*1000); //500ms
     }
 
-    return 0;
+    return XST_SUCCESS;
 }
 
 

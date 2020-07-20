@@ -4,7 +4,11 @@
 #include "xil_types.h"
 #include "xil_io.h"
 
-#define SHARED_ADDR (0x03000000)
+#include "xuartps.h"
+#include "xil_printf.h"
+
+
+#define SHARED_ADDR (0xFFFF0000)
 
 #define PRINT_MUTEX_OFF (0x0000)
 #define PRINT_MUTEX_ADDR (SHARED_ADDR+PRINT_MUTEX_OFF)
