@@ -33,13 +33,13 @@ int Init()
 
 int main()
 {
-    PRINT("CPU1: Start!\n");
-
     if (Init() != XST_SUCCESS)
     {
         PRINT("CPU1: Init Failed\n");
         return XST_FAILURE;
     }
+    PRINT("CPU1: Start!\n");
+    usleep(250*1000); //250ms
 
     uint32_t count = 0;
     while (1)
