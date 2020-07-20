@@ -15,7 +15,7 @@
 */
 
 
-#include "common.h"
+#include "../../Synth_system/common.h"
 
 #include "xil_mmu.h"
 
