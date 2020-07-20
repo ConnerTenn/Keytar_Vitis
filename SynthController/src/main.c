@@ -14,10 +14,8 @@
 *
 */
 
+#include "common.h"
 
-#include "xparameters.h"
-
-#include "xil_io.h"
 #include "xpseudo_asm.h"
 #include "xil_mmu.h"
 
@@ -28,6 +26,8 @@
 
 #include "xuartps.h"
 #include "xil_printf.h"
+
+#include "synth.h"
 
 
 #define UART_DEVICE_ID  XPAR_XUARTPS_0_DEVICE_ID
@@ -52,6 +52,8 @@ int InitUart(u16 DeviceId)
 {
     int status;
 
+    Out32(PRINT_MUTEX_ADDR, 0);
+
     //Initialize the UART driver so that it's ready to use
     //Look up the configuration in the config table and then initialize it.
     XUartPs_Config *Config = XUartPs_LookupConfig(DeviceId);
@@ -72,14 +74,10 @@ int main()
 {
     int status;
 
-    uint8_t *lock = (uint8_t *)0xFFFF0000;
-    *lock = 0;
-
-
     status = InitUart(UART_DEVICE_ID);
     if (status != XST_SUCCESS)
     {
-        xil_printf("Uartps hello world Example Failed\n");
+        PRINT("Uartps hello world Example Failed\n");
         return XST_FAILURE;
     }
 
@@ -91,7 +89,7 @@ int main()
     status = InitCPU1();
     if (status != XST_SUCCESS)
     {
-        xil_printf("Filed to initialize CPU 1\n");
+        PRINT("Filed to initialize CPU 1\n");
         return XST_FAILURE;
     }
 
@@ -101,12 +99,9 @@ int main()
     uint32_t count = 0;
     while (1)
     {
-        xil_printf("Hello World! %lu\n", count++);
+        PRINT("CPU0: %lu\n", count++);
         
         usleep(500*1000); //500ms
-
-        *lock = 1;
-        while (*lock == 1) {}
     }
 
     return 0;

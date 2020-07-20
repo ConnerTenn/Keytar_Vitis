@@ -15,7 +15,7 @@
 */
 
 
-#include "xparameters.h"
+#include "common.h"
 
 #include "xil_mmu.h"
 
@@ -30,21 +30,18 @@
 
 int main()
 {
-    uint8_t *lock = (uint8_t *)0xFFFF0000;
     uint32_t *buzzer = (uint32_t *)0x40000000;
 
     //Disable cache on OCM
     Xil_SetTlbAttributes(0xFFFF0000,0x14de2);           // S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
 
-    xil_printf("Core 2 Start!\n");
+    PRINT("CPU1: Start!\n");
 
 
     uint32_t count = 0;
     while (1)
     {
-        while(*lock == 0) {}
-        xil_printf("Hello World Core2! %lu\n", count++);
-        *lock = 0;
+        xil_printf("CPU1: %lu\n", count++);
         *buzzer = count*2;
         usleep(500*1000); //500ms
 
