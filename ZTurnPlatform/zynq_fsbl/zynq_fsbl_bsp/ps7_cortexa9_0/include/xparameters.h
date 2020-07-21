@@ -178,7 +178,7 @@
 
 /* Definitions for peripheral APBSLAVE_BREAKOUT_0 */
 #define XPAR_APBSLAVE_BREAKOUT_0_BASEADDR 0x40000000
-#define XPAR_APBSLAVE_BREAKOUT_0_HIGHADDR 0x40000FFF
+#define XPAR_APBSLAVE_BREAKOUT_0_HIGHADDR 0x400FFFFF
 
 
 /******************************************************************/
@@ -202,6 +202,28 @@
 
 /******************************************************************/
 
+/* Definitions for driver IICPS */
+#define XPAR_XIICPS_NUM_INSTANCES 1
+
+/* Definitions for peripheral PS7_I2C_0 */
+#define XPAR_PS7_I2C_0_DEVICE_ID 0
+#define XPAR_PS7_I2C_0_BASEADDR 0xE0004000
+#define XPAR_PS7_I2C_0_HIGHADDR 0xE0004FFF
+#define XPAR_PS7_I2C_0_I2C_CLK_FREQ_HZ 111111115
+
+
+/******************************************************************/
+
+/* Canonical definitions for peripheral PS7_I2C_0 */
+#define XPAR_XIICPS_0_DEVICE_ID XPAR_PS7_I2C_0_DEVICE_ID
+#define XPAR_XIICPS_0_BASEADDR 0xE0004000
+#define XPAR_XIICPS_0_HIGHADDR 0xE0004FFF
+#define XPAR_XIICPS_0_I2C_CLK_FREQ_HZ 111111115
+
+
+/******************************************************************/
+
+/* Definition for input Clock */
 /* Definitions for driver SCUGIC */
 #define XPAR_XSCUGIC_NUM_INSTANCES 1U
 
