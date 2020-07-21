@@ -18,8 +18,9 @@
 #include "../../Synth_system/common.h"
 
 #include "xil_mmu.h"
-
 #include "sleep.h"
+
+#include "video/sil9022.h"
 
 
 
@@ -39,7 +40,12 @@ int main()
         return XST_FAILURE;
     }
     PRINT("CPU1: Start!\n");
+
+    PRINT("CPU1: Init Sil9022\n");
+    Sil9022Init();
+
     usleep(250*1000); //250ms
+    
 
     uint32_t count = 0;
     while (1)

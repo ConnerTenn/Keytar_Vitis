@@ -28,6 +28,7 @@
 #define Reg8 *(volatile u8 *)
 
 
+#define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })
 
 #define PRINT(...) \
     ({ \
