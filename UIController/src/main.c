@@ -44,14 +44,14 @@ int main()
     PRINT("CPU1: Init Sil9022\n");
     Sil9022Init();
 
-    usleep(250*1000); //250ms
+    usleep(500*1000); //500ms
     
 
     uint32_t count = 0;
     while (1)
     {
         xil_printf("CPU1: %lu\n", count++);
-        usleep(500*1000); //500ms
+        usleep(2000*1000); //2000ms
 
     }
 

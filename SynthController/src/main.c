@@ -99,7 +99,7 @@ int main()
     {
         PRINT("CPU0: %lu\n", count++);
         
-        usleep(500*1000); //500ms
+        usleep(2000*1000); //2000ms
     }
 
     return XST_SUCCESS;

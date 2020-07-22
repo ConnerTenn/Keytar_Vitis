@@ -34,6 +34,7 @@ int InitI2C()
     return XST_SUCCESS;
 }
 
+//https://www.kernel.org/doc/html/latest/i2c/smbus-protocol.html
 void Sil9022WriteByte(u8 command, u8 val)
 {
     u8 msg[2] = {command, val};
@@ -56,18 +57,6 @@ int Sil9022Init()
 
     Sil9022WriteByte(0xC7, 0x00);
 
-    //set TPI video mode
-	// data[0] = PICOS2KHZ(fbi->var.pixclock) / 10;
-	// data[2] = fbi->var.hsync_len + fbi->var.left_margin +
-	// 	  fbi->var.xres + fbi->var.right_margin;
-	// data[3] = fbi->var.vsync_len + fbi->var.upper_margin +
-	// 	  fbi->var.yres + fbi->var.lower_margin;
-	// refresh = data[2] * data[3];
-	// refresh = (PICOS2KHZ(fbi->var.pixclock) * 1000) / refresh;
-	// data[1] = refresh * 100;
-	// tmp = (u8 *)data;
-	// for (i = 0; i < 8; i++)
-	// 	i2c_smbus_write_byte_data(sii902x.client, i, tmp[i]);
     u8 id = Sil9022ReadByte(0x1B);
     if (id == 0xb0) 
     {
@@ -82,20 +71,20 @@ int Sil9022Init()
     //Power up
     Sil9022WriteByte(0x1E, 0x00);
 
-    {
-        u16 data[4];
+    // {
+    //     u16 data[4];
 
-        data[0] = PICOS2KHZ(6734/*pixclock*/) / 10;
-	    data[2] = 44/*hsync_len*/ + 148/*left_margin*/ + 1920/*xres*/ + 88/*right_margin*/;
-	    data[3] = 5/*vsync_len*/ + 36/*upper_margin*/ + 1080/*yres*/ + 4/*lower_margin*/;
-	    u32 refresh = data[2] * data[3];
-        refresh = (PICOS2KHZ(6734/*pixclock*/) * 1000) / refresh;
-        data[1] = refresh * 100;
-	    for (u32 i = 0; i < 4*2; i++)
-        {
-		    Sil9022WriteByte(i, ((u8 *)data)+i);
-        }
-    }
+    //     data[0] = PICOS2KHZ(6667/*pixclock*/) / 10;
+	//     data[2] = 44/*hsync_len*/ + 148/*left_margin*/ + 1920/*xres*/ + 88/*right_margin*/;
+	//     data[3] = 5/*vsync_len*/ + 36/*upper_margin*/ + 1080/*yres*/ + 4/*lower_margin*/;
+	//     u32 refresh = data[2] * data[3];
+    //     refresh = (PICOS2KHZ(6667/*pixclock*/) * 1000) / refresh;
+    //     data[1] = refresh * 100;
+	//     for (u32 i = 0; i < 4*2; i++)
+    //     {
+	// 	    Sil9022WriteByte(i, ((u8 *)data)+i);
+    //     }
+    // }
     
 
     //input bus/pixel: full pixel wide (24bit), rising edge
@@ -105,7 +94,7 @@ int Sil9022Init()
 	//set output format to RGB
 	Sil9022WriteByte(0x0A, 0x00);
 
-
+    //Power on
     Sil9022WriteByte(0x1A, 0x01);
     
     return XST_SUCCESS;
