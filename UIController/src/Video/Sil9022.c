@@ -1,5 +1,5 @@
 
-#include "sil9022.h"
+#include "Sil9022.h"
 
 #include "xiicps.h"
 
@@ -52,8 +52,10 @@ u8 Sil9022ReadByte(u8 command)
 
 int Sil9022Init()
 {
-    InitI2C();
+    PRINT("CPU1: Init Sil9022\n");
 
+
+    InitI2C();
 
     Sil9022WriteByte(0xC7, 0x00);
 
@@ -73,7 +75,6 @@ int Sil9022Init()
 
     // {
     //     u16 data[4];
-
     //     data[0] = PICOS2KHZ(6667/*pixclock*/) / 10;
 	//     data[2] = 44/*hsync_len*/ + 148/*left_margin*/ + 1920/*xres*/ + 88/*right_margin*/;
 	//     data[3] = 5/*vsync_len*/ + 36/*upper_margin*/ + 1080/*yres*/ + 4/*lower_margin*/;

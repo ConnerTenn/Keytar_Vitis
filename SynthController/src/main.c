@@ -14,7 +14,7 @@
 *
 */
 
-#include "../../Synth_system/common.h"
+#include "../../Synth_system/Common.h"
 
 #include "xpseudo_asm.h"
 #include "xil_mmu.h"
@@ -24,7 +24,7 @@
 
 #include "sleep.h"
 
-#include "synth.h"
+#include "Synth.h"
 
 
 

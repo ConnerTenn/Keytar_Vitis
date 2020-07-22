@@ -23,9 +23,12 @@
 #define Out16 Xil_Out16
 #define Out8 Xil_Out8
 
-#define Reg32 *(volatile u32 *)
-#define Reg16 *(volatile u16 *)
-#define Reg8 *(volatile u8 *)
+#define MEM32(addr) ((volatile u32 *)(addr))
+#define MEM16(addr) ((volatile u16 *)(addr))
+#define MEM8(addr) ((volatile u8 *)(addr))
+#define Reg32(reg) *MEM32(reg)
+#define Reg16(reg) *MEM16(reg)
+#define Reg8(reg) *MEM8(reg)
 
 
 #define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })

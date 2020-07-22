@@ -1,5 +1,5 @@
 
-#include "../../../Synth_system/common.h"
+#include "../../../Synth_system/Common.h"
 
 
 #define SIL9022_I2C_ADDR 0x3B

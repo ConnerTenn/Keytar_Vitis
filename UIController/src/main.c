@@ -15,12 +15,13 @@
 */
 
 
-#include "../../Synth_system/common.h"
+#include "../../Synth_system/Common.h"
 
 #include "xil_mmu.h"
 #include "sleep.h"
 
-#include "video/sil9022.h"
+#include "Video/Sil9022.h"
+#include "Video/VideoDMA.h"
 
 
 
@@ -41,8 +42,11 @@ int main()
     }
     PRINT("CPU1: Start!\n");
 
-    PRINT("CPU1: Init Sil9022\n");
+    
+    InitVideoDMA();
+    
     Sil9022Init();
+
 
     usleep(500*1000); //500ms
     
