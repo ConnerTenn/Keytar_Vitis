@@ -94,12 +94,17 @@ int main()
         return XST_FAILURE;
     }
 
+    usleep(1000*1000);
+    
+    uint32_t *buzzer = (uint32_t *)0x40000000;
+
     uint32_t count = 0;
     while (1)
     {
         PRINT("CPU0: %lu\n", count++);
         
         usleep(2000*1000); //2000ms
+        *buzzer = count*2;
     }
 
     return XST_SUCCESS;

@@ -176,9 +176,9 @@
 #define XPAR_PS7_SLCR_0_S_AXI_HIGHADDR 0xF8000FFF
 
 
-/* Definitions for peripheral APBSLAVE_BREAKOUT_0 */
-#define XPAR_APBSLAVE_BREAKOUT_0_BASEADDR 0x40000000
-#define XPAR_APBSLAVE_BREAKOUT_0_HIGHADDR 0x400FFFFF
+/* Definitions for peripheral APBSLAVE_BREAKOUT_1 */
+#define XPAR_APBSLAVE_BREAKOUT_1_BASEADDR 0x40100000
+#define XPAR_APBSLAVE_BREAKOUT_1_HIGHADDR 0x40100FFF
 
 
 /******************************************************************/
