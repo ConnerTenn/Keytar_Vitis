@@ -13,37 +13,108 @@ typedef struct
         u32 DWord;
         struct
         {
-            u8 IRQDelayCount;
-            u8 IRQFrameCount;
-            u8 RepeatEn:1;
-            u8 ErrIrqEn:1;
-            u8 DelayCountIrqEn:1;
-            u8 FrameCountIrqEn:1;
-            u8 ReadFbPtr:4;
-            u8 GenLockSrc:1;
-            u8 RESERVED_1:2;
-            u8 FrameCountEn:1;
-            u8 GenLockEn:1;
-            u8 Reset:1;
-            u8 CircularPark:1;
             u8 Run:1;
+            u8 CircularPark:1;
+            u8 Reset:1;
+            u8 GenLockEn:1;
+            u8 FrameCountEn:1;
+            u8 RESERVED_1:2;
+            u8 GenLockSrc:1;
+            u8 ReadFbPtr:4;
+            u8 FrameCountIrqEn:1;
+            u8 DelayCountIrqEn:1;
+            u8 ErrIrqEn:1;
+            u8 RepeatEn:1;
+            u8 IRQFrameCount;
+            u8 IRQDelayCount;
         } Bitwise;
     } MM2S_Ctl;
 } MM2S_Ctl;
-#define VDMA_MM2S_CTRL_ST *((MM2S_Ctl *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_CTRL_OFF))
+#define VDMA_MM2S_CTRL_ST (*(MM2S_Ctl *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_CTRL_OFF))
 
 
 #define VDMA_MM2S_STATUS_OFF 0x04
 #define VDMA_MM2S_STATUS_REG Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_STATUS_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u8 Halted:1;
+            u8 RESERVED_1:3;
+            u8 InternalErr:1;
+            u8 SlaveErr:1;
+            u8 DecodeErr:1;
+            u8 StartOfFrameEarlyErr:1;
+            u8 RESERVED_2:4;
+            u8 FrameCountIrqEn:1;
+            u8 DelayCountIrqEn:1;
+            u8 ErrIrqEn:1;
+            u8 RESERVED_3:1;
+            u8 IRQFrameCount;
+            u8 IRQDelayCount;
+        } Bitwise;
+    } MM2S_Status;
+} MM2S_Status;
+#define VDMA_MM2S_STATUS_ST (*(MM2S_Status *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_STATUS_OFF))
 
 #define VDMA_REG_IDX_OFF 0x14
 #define VDMA_REG_IDX_REG Reg32(VIDEO_DMA_ADDR+VDMA_REG_IDX_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u32 RegIdx:1;
+            u32 RESERVED_1:31;
+        } Bitwise;
+    } MM2S_RegIdx;
+} MM2S_RegIdx;
+#define VDMA_REG_IDX_ST (*(MM2S_RegIdx *)MEM32(VIDEO_DMA_ADDR+VDMA_REG_IDX_OFF))
 
 #define VDMA_PARK_PTR_OFF 0x28
 #define VDMA_PARK_PTR_REG Reg32(VIDEO_DMA_ADDR+VDMA_PARK_PTR_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u8 ReadFramePtrRef:5;
+            u8 RESERVED_1:3;
+            u8 WriteFramePtrRef:5;
+            u8 RESERVED_2:3;
+            u8 ReadFrameStore:5;
+            u8 RESERVED_3:3;
+            u8 WriteFrameStore:5;
+            u8 RESERVED_4:3;
+        } Bitwise;
+    } ParkPtr;
+} ParkPtr;
+#define VDMA_PARK_PTR_ST (*(ParkPtr *)MEM32(VIDEO_DMA_ADDR+VDMA_PARK_PTR_OFF))
 
 #define VDMA_VERSION_OFF 0x2C
 #define VDMA_VERSION_REG Reg32(VIDEO_DMA_ADDR+VDMA_VERSION_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u16 XilinxInternal;
+            u16 Revision:4;
+            u16 MinorVersion:8;
+            u16 MajorVersion:4;
+        } Bitwise;
+    } VDMAVersion;
+} VDMAVersion;
+#define VDMA_VERSION_ST (*(VDMAVersion *)MEM32(VIDEO_DMA_ADDR+VDMA_VERSION_OFF))
 
 #define VDMA_S2MM_CTRL_OFF 0x30
 #define VDMA_S2MM_CTRL_REG Reg32(VIDEO_DMA_ADDR+VDMA_S2MM_CTRL_OFF)
