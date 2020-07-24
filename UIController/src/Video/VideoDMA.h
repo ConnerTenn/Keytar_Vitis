@@ -2,6 +2,8 @@
 #include "../../../Synth_system/Common.h"
 
 #define VIDEO_DMA_ADDR (XPAR_AXI_VDMA_0_BASEADDR)
+#define VIDEO_FRAME_BUFFERS_ADDR (0x10000000)
+#define VIDEO_FRAME_BUFFER_ADDR(fb) (0x10000000+0x200000*fb)
 
 #define VDMA_MM2S_CTRL_OFF 0x00
 #define VDMA_MM2S_CTRL_REG Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_CTRL_OFF)
@@ -129,12 +131,54 @@ typedef struct
 
 #define VDMA_MM2S_VSIZE_OFF 0x50
 #define VDMA_MM2S_VSIZE_REG Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_VSIZE_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u16 Size:13;
+            u16 RESERVED_1:3;
+            u16 RESERVED_2;
+        } Bitwise;
+    } MM2S_VSize;
+} MM2S_VSize;
+#define VDMA_MM2S_VSIZE_ST (*(MM2S_VSize *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_VSIZE_OFF))
 
 #define VDMA_MM2S_HSIZE_OFF 0x54
 #define VDMA_MM2S_HSIZE_REG Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_HSIZE_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u16 Size;
+            u16 RESERVED_1;
+        } Bitwise;
+    } MM2S_HSize;
+} MM2S_HSize;
+#define VDMA_MM2S_HSIZE_REG (*(MM2S_HSize *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_HSIZE_OFF))
 
 #define VDMA_MM2S_FRAME_DELAY_STRIDE_OFF 0x58
 #define VDMA_MM2S_FRAME_DELAY_STRIDE_REG Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_FRAME_DELAY_STRIDE_OFF)
+typedef struct
+{
+    union
+    {
+        u32 DWord;
+        struct
+        {
+            u16 Stride;
+            u8 RESERVED_1;
+            u8 FrameDelay:5;
+            u8 RESERVED_2:3;
+        } Bitwise;
+    } MM2S_DelayAndStride;
+} MM2S_DelayAndStride;
+#define VDMA_MM2S_FRAME_DELAY_STRIDE_ST (*(MM2S_DelayAndStride *)MEM32(VIDEO_DMA_ADDR+VDMA_MM2S_FRAME_DELAY_STRIDE_OFF))
 
 #define VDMA_MM2S_START_ADDR_OFF(fb) (0x5C+((fb)-1)*4)
 #define VDMA_MM2S_START_ADDR_REG(fb) Reg32(VIDEO_DMA_ADDR+VDMA_MM2S_START_ADDR_OFF(fb))
