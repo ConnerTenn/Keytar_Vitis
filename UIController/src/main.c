@@ -54,6 +54,7 @@ int main()
     uint32_t count = 0;
     while (1)
     {
+        VCTL_FRAME_PTR_REG = count % 2;
         PRINT("CPU1: %lu\n", count++);
         
         PRINT("CPU1: VDMA Status 0x%08X\n", VDMA_MM2S_STATUS_REG);

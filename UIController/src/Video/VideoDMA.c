@@ -22,9 +22,9 @@ int InitVideoDMA()
             .Run = 1,
             .CircularPark = 1,
             .Reset = 0,
-            .GenLockEn = 0,
+            .GenLockEn = 1,
             .FrameCountEn = 0,
-            .GenLockSrc = 1, //0:External GenLock  1:Internal GenLock
+            .GenLockSrc = 0, //0:External GenLock  1:Internal GenLock
             .ReadFbPtr = 0,
             .FrameCountIrqEn = 0,
             .DelayCountIrqEn = 0,
@@ -36,7 +36,7 @@ int InitVideoDMA()
 
     VDMA_MM2S_FRAME_DELAY_STRIDE_ST = (MM2S_DelayAndStride){.MM2S_DelayAndStride={.Bitwise={
             .FrameDelay = 1,
-            .Stride = 1920
+            .Stride = 1920*3
         }}};
 
     PRINT("CPU1: Set Frame Buffer Addresses\n");
@@ -46,11 +46,11 @@ int InitVideoDMA()
     VDMA_MM2S_START_ADDR_REG(2) = VIDEO_FRAME_BUFFER_ADDR(2);
 
     PRINT("CPU1: Set Frame Size, which starts video\n");
-    VDMA_MM2S_HSIZE_REG = 1920;
+    VDMA_MM2S_HSIZE_REG = 1920*3;
     VDMA_MM2S_VSIZE_REG = 1080;
 
     PRINT("CPU1: Set Frame PTR\n");
-    VCTL_FRAME_PTR_REG = 0;
+    VCTL_FRAME_PTR_REG = 1;
     PRINT("CPU1: Frame PTR set to: %d\n", VCTL_FRAME_PTR_REG);
 
     PRINT("CPU1: VDMA Status 0x%08X\n", VDMA_MM2S_STATUS_REG);
@@ -60,6 +60,37 @@ int InitVideoDMA()
     PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
 
 
+    u32 off;
+    off = 0;
+    for (u32 y = 0; y < 1080; y++)
+    {
+        for (u32 x = 0; x < 1920; x++)
+        {
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = 0x00; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = 0xFF; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = 0xFF; off++;
+        }
+    }
+    off = 0;
+    for (u32 y = 0; y < 1080; y++)
+    {
+        for (u32 x = 0; x < 1920; x++)
+        {
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = 0xFF; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = 0xFF; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = 0x00; off++;
+        }
+    }
+    off = 0;
+    for (u32 y = 0; y < 1080; y++)
+    {
+        for (u32 x = 0; x < 1920; x++)
+        {
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(2)+off) = 0xFF; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(2)+off) = 0x00; off++;
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(2)+off) = 0xFF; off++;
+        }
+    }
 
 
     return XST_SUCCESS;
