@@ -268,6 +268,11 @@
 #define XPAR_APBSLAVE_BREAKOUT_1_HIGHADDR 0x40000FFF
 
 
+/* Definitions for peripheral APBSLAVE_BREAKOUT_2 */
+#define XPAR_APBSLAVE_BREAKOUT_2_BASEADDR 0x41010000
+#define XPAR_APBSLAVE_BREAKOUT_2_HIGHADDR 0x41010FFF
+
+
 /******************************************************************/
 
 /* Definitions for driver GPIOPS */

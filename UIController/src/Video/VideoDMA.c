@@ -34,6 +34,12 @@ int InitVideoDMA()
             .IRQDelayCount = 0,
         }}};
 
+    PRINT("CPU1: Set Frame PTR\n");
+    V_FRAME_PTR_REG = 2;
+    PRINT("CPU1: Frame PTR set to: %d\n", V_FRAME_PTR_REG);
+
+
+
 
     return XST_SUCCESS;
 }
