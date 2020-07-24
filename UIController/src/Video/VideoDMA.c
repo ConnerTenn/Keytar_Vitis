@@ -20,17 +20,17 @@ int InitVideoDMA()
 
     VDMA_MM2S_CTRL_ST = (MM2S_Ctl){.MM2S_Ctl={.Bitwise={
             .Run = 1,
-            .CircularPark = 0, //Park Mode Enabled
+            .CircularPark = 1,
             .Reset = 0,
-            .GenLockEn = 1, //Genlock Enabled
+            .GenLockEn = 0,
             .FrameCountEn = 0,
-            .GenLockSrc = 0, //External GenLock
+            .GenLockSrc = 1, //0:External GenLock  1:Internal GenLock
             .ReadFbPtr = 0,
             .FrameCountIrqEn = 0,
             .DelayCountIrqEn = 0,
             .ErrIrqEn = 0,
             .RepeatEn = 0,
-            .IRQFrameCount = 0,
+            .IRQFrameCount = 1,
             .IRQDelayCount = 0,
         }}};
 
@@ -46,12 +46,18 @@ int InitVideoDMA()
     VDMA_MM2S_START_ADDR_REG(2) = VIDEO_FRAME_BUFFER_ADDR(2);
 
     PRINT("CPU1: Set Frame Size, which starts video\n");
-    VDMA_S2MM_HSIZE_REG = 1920;
-    VDMA_S2MM_VSIZE_REG = 1080;
+    VDMA_MM2S_HSIZE_REG = 1920;
+    VDMA_MM2S_VSIZE_REG = 1080;
 
     PRINT("CPU1: Set Frame PTR\n");
-    V_FRAME_PTR_REG = 2;
-    PRINT("CPU1: Frame PTR set to: %d\n", V_FRAME_PTR_REG);
+    VCTL_FRAME_PTR_REG = 0;
+    PRINT("CPU1: Frame PTR set to: %d\n", VCTL_FRAME_PTR_REG);
+
+    PRINT("CPU1: VDMA Status 0x%08X\n", VDMA_MM2S_STATUS_REG);
+    PRINT("CPU1: Video Status 0x%08X\n", VCTL_VDMA_STATUS_REG);
+    PRINT("CPU1: Video Signals 0x%01X\n", VCTL_SIGNALS_REG);
+    PRINT("CPU1: FIFO Level %d\n", VCTL_FIFO_LEVEL_REG);
+    PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
 
 
 
