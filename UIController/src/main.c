@@ -33,6 +33,32 @@ int Init()
     return XST_SUCCESS;
 }
 
+u8 ActiveFB = 1;
+void FlipBuffers()
+{
+    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(ActiveFB), 1080*1920*3);
+    VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = ActiveFB;
+    ActiveFB = 1-ActiveFB;
+}
+
+void Draw()
+{
+    static u32 counter = 0;
+
+    for (u32 y = 0, off = 0; y < 1080; y++)
+    {
+        for (u32 x = 0; x < 1920; x++)
+        {
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = 0xFF*(x+y-counter)/1080; off++; //Blue
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = (x-counter); off++; //Green
+            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = (0xFF*(y-counter)/1080); off++; //Red
+        }
+    }
+    FlipBuffers();
+
+    counter+=5;
+}
+
 int main()
 {
     if (Init() != XST_SUCCESS)
@@ -51,19 +77,21 @@ int main()
     usleep(500*1000); //500ms
     
 
-    uint32_t count = 0;
+    // uint32_t count = 0;
     while (1)
     {
         // if (count%4==0) { VCTL_FRAME_PTR_REG = 1-VCTL_FRAME_PTR_REG; }
-        if (count%4==0) { VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1 - VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef; }
+        // if (count%4==0) { VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1 - VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef; }
     
-        PRINT("CPU1: %lu\n", count++);
-        
-        PRINT("CPU1: VDMA Status 0x%08X    Video Status 0x%08X    Video Signals 0x%01X    FIFO Level %d\n", VDMA_MM2S_STATUS_REG, VCTL_VDMA_STATUS_REG, VCTL_SIGNALS_REG, VCTL_FIFO_LEVEL_REG);
-        PRINT("CPU1: Set Frame Ptr %d\n", VCTL_FRAME_PTR_REG);
-        PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
+        // PRINT("CPU1: %lu\n", count++);
 
-        usleep(500*1000); //2000ms
+        Draw();
+        
+        // PRINT("CPU1: VDMA Status 0x%08X    Video Status 0x%08X    Video Signals 0x%01X    FIFO Level %d\n", VDMA_MM2S_STATUS_REG, VCTL_VDMA_STATUS_REG, VCTL_SIGNALS_REG, VCTL_FIFO_LEVEL_REG);
+        // PRINT("CPU1: Set Frame Ptr %d\n", VCTL_FRAME_PTR_REG);
+        // PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
+
+        // usleep(100*1000); //2000ms
 
     }
 

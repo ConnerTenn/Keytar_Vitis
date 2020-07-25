@@ -1,7 +1,6 @@
 
 
 #include "VideoDMA.h"
-#include "xil_cache.h"
 
 int InitVideoDMA()
 {
@@ -57,29 +56,11 @@ int InitVideoDMA()
 
 
     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1;
-    memset(VIDEO_FRAME_BUFFER_ADDR(0), 0, 1080*1920*3);
-    for (u32 y = 0, off = 0; y < 1080; y++)
-    {
-        for (u32 x = 0; x < 1920; x++)
-        {
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = (0xFF*x/1920); off++;
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = 0xFF; off++;
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(0)+off) = 0xFF; off++;
-        }
-    }
+    memset((void *)VIDEO_FRAME_BUFFER_ADDR(0), 0, 1080*1920*3);
     Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(0), 1080*1920*3);
 
     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 0;
-    memset(VIDEO_FRAME_BUFFER_ADDR(1), 0, 1080*1920*3);
-    for (u32 y = 0, off = 0; y < 1080; y++)
-    {
-        for (u32 x = 0; x < 1920; x++)
-        {
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = 0x00; off++;
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = 0x00; off++;
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(1)+off) = (0xFF*y/1080); off++;
-        }
-    }
+    memset((void *)VIDEO_FRAME_BUFFER_ADDR(1), 0, 1080*1920*3);
     Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(1), 1080*1920*3);
 
     PRINT("CPU1: Set Frame Size, which starts video\n");

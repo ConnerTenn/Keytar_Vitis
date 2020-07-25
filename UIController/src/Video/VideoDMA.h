@@ -1,5 +1,6 @@
 
 #include "../../../Synth_system/Common.h"
+#include "xil_cache.h"
 
 #define VIDEO_DMA_ADDR (XPAR_AXI_VDMA_0_BASEADDR)
 #define VIDEO_FRAME_BUFFERS_ADDR (0x10000000)
