@@ -3,6 +3,7 @@
 #include "xparameters.h"
 #include "xil_types.h"
 #include "xil_io.h"
+#include "stdlib.h"
 
 #include "xuartps.h"
 #include "xil_printf.h"

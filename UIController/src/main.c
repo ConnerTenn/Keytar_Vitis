@@ -54,16 +54,16 @@ int main()
     uint32_t count = 0;
     while (1)
     {
-        VCTL_FRAME_PTR_REG = count % 2;
+        // if (count%4==0) { VCTL_FRAME_PTR_REG = 1-VCTL_FRAME_PTR_REG; }
+        if (count%4==0) { VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1 - VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef; }
+    
         PRINT("CPU1: %lu\n", count++);
         
-        PRINT("CPU1: VDMA Status 0x%08X\n", VDMA_MM2S_STATUS_REG);
-        PRINT("CPU1: Video Status 0x%08X\n", VCTL_VDMA_STATUS_REG);
-        PRINT("CPU1: Video Signals 0x%01X\n", VCTL_SIGNALS_REG);
-        PRINT("CPU1: FIFO Level %d\n", VCTL_FIFO_LEVEL_REG);
+        PRINT("CPU1: VDMA Status 0x%08X    Video Status 0x%08X    Video Signals 0x%01X    FIFO Level %d\n", VDMA_MM2S_STATUS_REG, VCTL_VDMA_STATUS_REG, VCTL_SIGNALS_REG, VCTL_FIFO_LEVEL_REG);
+        PRINT("CPU1: Set Frame Ptr %d\n", VCTL_FRAME_PTR_REG);
         PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
 
-        usleep(2000*1000); //2000ms
+        usleep(500*1000); //2000ms
 
     }
 
