@@ -36,7 +36,7 @@ int Init()
 u8 ActiveFB = 1;
 void FlipBuffers()
 {
-    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(ActiveFB), 1080*1920*3);
+    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(ActiveFB), 1080*1920*2);
     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = ActiveFB;
     ActiveFB = 1-ActiveFB;
 }
@@ -49,9 +49,10 @@ void Draw()
     {
         for (u32 x = 0; x < 1920; x++)
         {
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = 0xFF*(x+y-counter)/1080; off++; //Blue
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = (x-counter); off++; //Green
-            *MEM8(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = (0xFF*(y-counter)/1080); off++; //Red
+            u16 red = (0xFF*(y-counter)/1080);
+            u16 green = (x-counter);
+            u16 blue = 0xFF*(x+y-counter)/1080;
+            *MEM16(VIDEO_FRAME_BUFFER_ADDR(ActiveFB)+off) = ((red&0x1F)<<11) | ((green&0x3F)<<5) | (blue&0x1F); off += 2;
         }
     }
     FlipBuffers();

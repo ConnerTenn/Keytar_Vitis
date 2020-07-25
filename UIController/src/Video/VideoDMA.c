@@ -35,7 +35,7 @@ int InitVideoDMA()
 
     VDMA_MM2S_FRAME_DELAY_STRIDE_ST = (MM2S_DelayAndStride){.MM2S_DelayAndStride={.Bitwise={
             .FrameDelay = 1,
-            .Stride = 1920*3
+            .Stride = 1920*2
         }}};
 
     PRINT("CPU1: Set Frame Buffer Addresses\n");
@@ -56,15 +56,15 @@ int InitVideoDMA()
 
 
     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1;
-    memset((void *)VIDEO_FRAME_BUFFER_ADDR(0), 0, 1080*1920*3);
-    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(0), 1080*1920*3);
+    memset((void *)VIDEO_FRAME_BUFFER_ADDR(0), 0, 1080*1920*2);
+    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(0), 1080*1920*2);
 
     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 0;
-    memset((void *)VIDEO_FRAME_BUFFER_ADDR(1), 0, 1080*1920*3);
-    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(1), 1080*1920*3);
+    memset((void *)VIDEO_FRAME_BUFFER_ADDR(1), 0, 1080*1920*2);
+    Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(1), 1080*1920*2);
 
     PRINT("CPU1: Set Frame Size, which starts video\n");
-    VDMA_MM2S_HSIZE_REG = 1920*3;
+    VDMA_MM2S_HSIZE_REG = 1920*2;
     VDMA_MM2S_VSIZE_REG = 1080;
 
 
