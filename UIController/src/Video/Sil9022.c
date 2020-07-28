@@ -96,54 +96,61 @@ int Sil9022Init()
 	Sil9022WriteByte(0x0A, 0x00);
 
 
-	// Sil9022WriteByte(0x25, 0x00);
-	// Sil9022WriteByte(0x26, 0x40);
-	// Sil9022WriteByte(0x27, 0x00);
-
-    // /* Set TPI audio configuration write data */
-	// temp = TPI_AUDIO_PASS_BASIC;
-	// i2c_write(CONFIG_SYS_I2C_DVI_ADDR, TPI_AUDIO_HANDING_REG, 1, &temp, 1);
-
-	// temp = TPI_AUDIO_INTF_I2S | TPI_AUDIO_INTF_NORMAL |
-	// 	TPI_AUDIO_TYPE_PCM;
-	// i2c_write(CONFIG_SYS_I2C_DVI_ADDR, TPI_AUDIO_INTF_REG, 1, &temp, 1);
-
-	// temp = TPI_AUDIO_SAMP_SIZE_16BIT | TPI_AUDIO_SAMP_FREQ_44K;
-	// i2c_write(CONFIG_SYS_I2C_DVI_ADDR, TPI_AUDIO_FREQ_REG, 1, &temp, 1);
-
-	// //audio setup
-	// Sil9022WriteByte(0x26, TPI_AUDIO_INTF_I2S | TPI_AUDIO_INTF_MUTE | TPI_AUDIO_TYPE_PCM);
-
-    // // Sil9022WriteByte(0x20, (1<<7) | ());
-    // // Sil9022WriteByte(0x1F, );
-
-	// Sil9022WriteByte(0x27, TPI_AUDIO_SAMP_SIZE_16BIT | TPI_AUDIO_SAMP_FREQ_96K);
-
-    // // Sil9022WriteByte(0xBF, );
-	
-    // Sil9022WriteByte(0x24, 0b1010);
-    // // Sil9022WriteByte(0x25, TPI_AUDIO_PASS_BASIC);
-    // Sil9022WriteByte(0x25, 0b0010);
-
-	// Sil9022WriteByte(0x26, TPI_AUDIO_INTF_I2S | TPI_AUDIO_INTF_NORMAL | TPI_AUDIO_TYPE_PCM);
+	// https://wenku.baidu.com/view/f40e562e8bd63186bdebbcb2.html?pn=NaN
 
 
 	Sil9022WriteByte(0x26, (0b10<<6) | (1<<4) | 0b0001); //I2S, Mute, PCM
 
-    Sil9022WriteByte(0x20, (1<<7)); //Sample on rising edge
+    Sil9022WriteByte(0x20, (1<<7) | (0b001<<4) | (1<<2)); //Sample on rising edge, 256 MCLK multiplier, right justified
     Sil9022WriteByte(0x1F, (1<<7) | (0<<4) | (1<<3) | 0); //Enable SD#0 on FIFO#0, Auto down sample
     Sil9022WriteByte(0x1F, (0<<7) | (1<<4) | 1); //Disable SD#1 on FIFO#1
-    Sil9022WriteByte(0x1F, (0<<7) | (2<<4) | 2); //Disable SD#1 on FIFO#1
-    Sil9022WriteByte(0x1F, (0<<7) | (3<<4) | 3); //Disable SD#1 on FIFO#1
+    Sil9022WriteByte(0x1F, (0<<7) | (2<<4) | 2); //Disable SD#2 on FIFO#2
+    Sil9022WriteByte(0x1F, (0<<7) | (3<<4) | 3); //Disable SD#3 on FIFO#3
 	Sil9022WriteByte(0x27, (0b01<<6) | (0b011<<3)); //16 bit, 48KHz
 
+    //http://read.pudn.com/downloads222/doc/1046129/CEA861D.pdf [p.24]
 
-	Sil9022WriteByte(0x25, 0b0010); //48KHz
-	Sil9022WriteByte(0x24, 0b0010); //16 bit
+    u8 infoFrame[] = {
+        (1<<7) | 0b010, //Enable, Audio
+        (1<<7) | 4, //InfoFrame, Type=4
+        0x01, //Version
+        10, //Length
+        0, //CRC
+        //Data Bytes
+        (0b0001<<4) | 0b001, //PCM, 2 Channels
+        (0b011<<2) | 0b01, //48KHz, 16 bit
+        0,
+        0x00, //Channel 1: Left. Channel 2: Right
+        (0b0000<<3), //0db Shift
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+    
+    u8 crc = infoFrame[1] + infoFrame[3]; // Identifier code for AVI InfoFrame, length  
+    for (u8 i = 0; i < infoFrame[3]; i++)
+    {
+        crc += infoFrame[i+5];
+    }
+    crc = 0x100-(u16)crc;
+    infoFrame[4] = crc;
+
+    for (u8 i = 0; i < sizeof(infoFrame); i++)
+    {
+        Sil9022WriteByte(0xBF+i, infoFrame[i]);
+    }
+
+
+
+    //http://read.pudn.com/downloads222/doc/1046129/CEA861D.pdf [p.32]
+	Sil9022WriteByte(0x23, /*(2<<4) |*/ 0); //SD#0: 2 Channels
+	Sil9022WriteByte(0x24, 0b0010); //48KHz
+	Sil9022WriteByte(0x25, 0b0010); //16 bit
 
 
 	Sil9022WriteByte(0x26, (0b10<<6) | (0<<4) | 0b0001); //I2S, Un Mute, PCM
-
 
     //Power on
     Sil9022WriteByte(0x1A, 0x01);

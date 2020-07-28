@@ -85,7 +85,6 @@ int Init()
     return XST_SUCCESS;
 }
 
-
 int main()
 {
     if (Init() != XST_SUCCESS)
@@ -94,29 +93,34 @@ int main()
         return XST_FAILURE;
     }
 
-    usleep(1000*1000);
+    usleep(2000*1000);
     
-    // uint32_t *buzzer = (uint32_t *)0x40000000;
-
-    SYNTH_INCR_REG(0) = 1000;
-    SYNTH_ATTACK_REG(0) = 1000;
-    SYNTH_DECAY_REG(0) = 10;
-    SYNTH_SUSTAIN_REG(0) = 0x00FFFFFF;
-    SYNTH_RELEASE_REG(0) = 1000;
-    SYNTH_GATE_REG(0) = 1;
 
 
-    PRINT("CPU1: Synth\n    Increment:0x%08X\n    Attack:0x%08X\n    Decay:0x%08X\n    Sustain:0x%08X\n    Release:0x%08X\n    Gate:0x%08X\n",
-        SYNTH_INCR_REG(0), SYNTH_ATTACK_REG(0), SYNTH_DECAY_REG(0), SYNTH_SUSTAIN_REG(0), SYNTH_RELEASE_REG(0), SYNTH_GATE_REG(0));
 
-    // uint32_t count = 0;
+    uint32_t count = 0;
     while (1)
     {
+        if (count % 8 == 0)
+        {
+            SYNTH_INCR_REG(0) = (((u32)rand())%2000)+1000;
+            SYNTH_ATTACK_REG(0) = 50;
+            SYNTH_WAVETYPE_REG(0) = 1;
+            SYNTH_DECAY_REG(0) = 50;
+            SYNTH_SUSTAIN_REG(0) = 0x00FFFFFF;
+            SYNTH_RELEASE_REG(0) = 50;
+            SYNTH_GATE_REG(0) = 1;
+        }
+        else if (count % 8 == 4)
+        {
+            SYNTH_GATE_REG(0) = 0;
+        }
+
         // PRINT("CPU0: %lu\n", count++);
-        PRINT("CPU0: Synth ADSRState:%d Envolope:0x%08X\n", SYNTH_ADSR_STATE_REG(0), SYNTH_ENVELOPE_REG(0));
+        PRINT("CPU0: Synth Incr:%d  ADSRState:%d  Envolope:0x%08X\n", SYNTH_INCR_REG(0), SYNTH_ADSR_STATE_REG(0), SYNTH_ENVELOPE_REG(0));
         
-        usleep(500*1000); //2000ms
-        // *buzzer = count*2;
+        usleep(1000*1000); //2000ms
+        count++;
     }
 
     return XST_SUCCESS;
