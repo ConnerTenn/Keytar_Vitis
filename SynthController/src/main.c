@@ -101,9 +101,9 @@ int main()
     uint32_t count = 0;
     while (1)
     {
-        if (count % 8 == 0)
+        if (count % 4 == 0)
         {
-            SYNTH_INCR_REG(0) = count+1;//(((u32)rand())%2000)+1000;
+            SYNTH_INCR_REG(0) = count*100+1500;//(((u32)rand())%2000)+1000;
             SYNTH_ATTACK_REG(0) = 50;
             SYNTH_WAVETYPE_REG(0) = 0;//1;
             SYNTH_DECAY_REG(0) = 50;
@@ -111,7 +111,7 @@ int main()
             SYNTH_RELEASE_REG(0) = 50;
             SYNTH_GATE_REG(0) = 1;
         }
-        else if (count % 8 == 4)
+        else if (count % 4 == 2)
         {
             SYNTH_GATE_REG(0) = 0;
         }
@@ -119,8 +119,8 @@ int main()
         // PRINT("CPU0: %lu\n", count++);
         PRINT("CPU0: Synth Incr:%d  ADSRState:%d  Envolope:0x%08X\n", SYNTH_INCR_REG(0), SYNTH_ADSR_STATE_REG(0), SYNTH_ENVELOPE_REG(0));
         
-        usleep(2000*1000); //2000ms
-        count++;
+        usleep(100*1000); //100ms
+        count = count<4*20 ? count+1 : 0;
     }
 
     return XST_SUCCESS;
