@@ -95,33 +95,104 @@ int main()
 
     usleep(2000*1000);
     
+    PRINT("CPU0: Begin\n");
 
+    for (u8 k=0; k<sizeof(KeyState); k++)
+    {
+        KeyState[k] = 0;
+        KeyChannel[k] = (u8)-1;
+    }
 
 
     uint32_t count = 0;
     while (1)
     {
-        if (count % 4 == 0)
+        //Keyboard
+        for (u8 i=0; i<8; i++)
         {
-            SYNTH_INCR_REG(0) = count*100+1500;//(((u32)rand())%2000)+1000;
-            SYNTH_ATTACK_REG(0) = 50;
-            SYNTH_WAVETYPE_REG(0) = 0;//1;
-            SYNTH_DECAY_REG(0) = 50;
-            SYNTH_SUSTAIN_REG(0) = 0x00FFFFFF;
-            SYNTH_RELEASE_REG(0) = 50;
-            SYNTH_GATE_REG(0) = 1;
+            KEYBOARD_DRIVE_REG = (1<<i);
+            dmb(); //Wait for write to complete
+            usleep(100);
+            u8 keys = KEYBOARD_SENSE_REG;
+            dmb(); //Wait for Read to complete
+
+            // PRINT("0x%02X:0x%02X  ", KEYBOARD_DRIVE_REG, keys); dmb(); //Wait for Read to complete
+
+            KEYBOARD_DRIVE_REG = 0;
+            dmb(); //Wait for write to complete
+            
+            for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
+            {
+                u8 *state = &KeyState[i*8+k];
+                if ((keys>>k)&1) //If Key Pressed
+                {
+                    if (*state == 1)
+                    {
+                        *state = 2;
+                    }
+                    else if (*state != 2)
+                    {
+                        *state = 1;
+                    }
+                }
+                else //key not pressed
+                {
+                    if (*state == 2)
+                    {
+                        *state = 3;
+                    }
+                    else if (*state == 3)
+                    {
+                        *state = 0;
+                    }
+                };
+            }
+            usleep(1);
         }
-        else if (count % 4 == 2)
+        // PRINT("\n");
+
+        for (u8 k=0; k<sizeof(KeyState); k++)
         {
-            SYNTH_GATE_REG(0) = 0;
+            if (KeyState[k] == 1) //KeyDown
+            {
+                u8 channel = 0;
+
+                while (channel<MAX_CHANNELS && SYNTH_RUNNING_REG(channel)==1)
+                {
+                    channel++;
+                }
+
+                if (channel < MAX_CHANNELS)
+                {
+                    KeyChannel[k] = channel;
+
+                    SYNTH_INCR_REG(channel) = NoteIncrs[k + KeyOctaveOffset];
+                    SYNTH_ATTACK_REG(channel) = 200;
+                    SYNTH_WAVETYPE_REG(channel) = 0;
+                    SYNTH_DECAY_REG(channel) = 50;
+                    SYNTH_SUSTAIN_REG(channel) = 0x00FFFFFF;
+                    SYNTH_RELEASE_REG(channel) = 50;
+                    SYNTH_GATE_REG(channel) = 1;
+
+                    PRINT("CPU0: Gate ON  Channel:%d  Incr:%d\n", channel, NoteIncrs[k + KeyOctaveOffset]);
+                }
+            }
+            else if (KeyState[k] == 3) //KeyUP
+            {
+                u8 channel = KeyChannel[k];
+                if (channel!=(u8)-1)
+                {
+                    SYNTH_GATE_REG(channel) = 0;
+                    KeyChannel[k] = (u8)-1;
+
+                    PRINT("CPU0: Gate OFF  Channel:%d\n", channel);
+                }
+            }
         }
 
-        // PRINT("CPU0: %lu\n", count++);
-        PRINT("CPU0: Synth Incr:%d  ADSRState:%d  Envolope:0x%08X\n", SYNTH_INCR_REG(0), SYNTH_ADSR_STATE_REG(0), SYNTH_ENVELOPE_REG(0));
-        
-        usleep(100*1000); //100ms
-        count = count<4*20 ? count+1 : 0;
+        count=count<450?count+1:0;
     }
+
 
     return XST_SUCCESS;
 }

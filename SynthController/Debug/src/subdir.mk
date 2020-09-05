@@ -7,12 +7,15 @@ LD_SRCS += \
 ../src/lscript.ld 
 
 C_SRCS += \
+../src/Synth.c \
 ../src/main.c 
 
 OBJS += \
+./src/Synth.o \
 ./src/main.o 
 
 C_DEPS += \
+./src/Synth.d \
 ./src/main.d 
 
 

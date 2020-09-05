@@ -273,6 +273,11 @@
 #define XPAR_APBSLAVE_BREAKOUT_VIDEO_CTL_HIGHADDR 0x80010FFF
 
 
+/* Definitions for peripheral APBSLAVE_BREAKOUT_KEYBOARD */
+#define XPAR_APBSLAVE_BREAKOUT_KEYBOARD_BASEADDR 0x40100000
+#define XPAR_APBSLAVE_BREAKOUT_KEYBOARD_HIGHADDR 0x40100FFF
+
+
 /******************************************************************/
 
 /* Definitions for driver GPIOPS */
