@@ -167,10 +167,10 @@ int main()
                     KeyChannel[k] = channel;
 
                     SYNTH_INCR_REG(channel) = NoteIncrs[k + KeyOctaveOffset];
-                    SYNTH_ATTACK_REG(channel) = 200;
-                    SYNTH_WAVETYPE_REG(channel) = 0;
+                    SYNTH_ATTACK_REG(channel) = 300;
+                    SYNTH_WAVETYPE_REG(channel) = 1;
                     SYNTH_DECAY_REG(channel) = 50;
-                    SYNTH_SUSTAIN_REG(channel) = 0x00FFFFFF;
+                    SYNTH_SUSTAIN_REG(channel) = 0xAFFFFFFF;
                     SYNTH_RELEASE_REG(channel) = 50;
                     SYNTH_GATE_REG(channel) = 1;
 
