@@ -11,9 +11,6 @@
 
 #define SHARED_ADDR (0xFFFF0000)
 
-#define PRINT_MUTEX_OFF (0x0000)
-#define PRINT_MUTEX_ADDR (SHARED_ADDR+PRINT_MUTEX_OFF)
-
 
 //Function Macors
 #define In32 Xil_In32
@@ -34,6 +31,10 @@
 
 #define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })
 
+
+#define PRINT_MUTEX_OFF (0x0000)
+#define PRINT_MUTEX_ADDR (SHARED_ADDR+PRINT_MUTEX_OFF)
+
 #define PRINT(...) \
     ({ \
         while (In8(PRINT_MUTEX_ADDR)) {} \
@@ -42,4 +43,19 @@
         Out8(PRINT_MUTEX_ADDR, 0); \
     })
 
+#define TERM_RESET   "\e[m"
+#define TERM_BLACK   "\e[1;30m"
+#define TERM_RED     "\e[1;31m"
+#define TERM_GREEN   "\e[1;32m"
+#define TERM_YELLOW  "\e[1;33m"
+#define TERM_BLUE    "\e[1;34m"
+#define TERM_MAGENTA "\e[1;35m"
+#define TERM_CYAN    "\e[1;36m"
+#define TERM_WHITE   "\e[1;37m"
+#define TERM_UP      "\e[1F"
+
+#define TERM_MOVE_UP(n)\
+    ({ \
+        PRINT("\e[%dF", (n)); \
+    })
 

@@ -93,7 +93,7 @@ int main()
         return XST_FAILURE;
     }
 
-    usleep(2000*1000);
+    usleep(500*1000);
     
     PRINT("CPU0: Begin\n");
 
@@ -104,7 +104,9 @@ int main()
     }
 
 
-    uint32_t count = 0;
+    u8 clear = 0;
+
+    u32 count = 0;
     while (1)
     {
         //Keyboard
@@ -124,32 +126,26 @@ int main()
             for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
             {
                 u8 *state = &KeyState[i*8+k];
-                if ((keys>>k)&1) //If Key Pressed
+                u8 pressed = (keys>>k)&1;
+                switch (*state)
                 {
-                    if (*state == 1)
-                    {
-                        *state = 2;
-                    }
-                    else if (*state != 2)
-                    {
-                        *state = 1;
-                    }
+                case 0: //Unpressed
+                    *state = pressed ? 1 : 0;
+                    break;
+                case 1: //KeyDown
+                case 2: //KeyPressed
+                    *state = pressed ? 2 : 3;
+                    break;
+                case 3: //KeyUp
+                    *state = pressed ? 1 : 0;
+                    break;
+                default: //Unknown
+                    *state = pressed ? 1 : 3;
+                    break;
                 }
-                else //key not pressed
-                {
-                    if (*state == 2)
-                    {
-                        *state = 3;
-                    }
-                    else if (*state == 3)
-                    {
-                        *state = 0;
-                    }
-                };
             }
             usleep(1);
         }
-        // PRINT("\n");
 
         for (u8 k=0; k<sizeof(KeyState); k++)
         {
@@ -174,7 +170,8 @@ int main()
                     SYNTH_RELEASE_REG(channel) = 50;
                     SYNTH_GATE_REG(channel) = 1;
 
-                    PRINT("CPU0: Gate ON  Channel:%d  Incr:%d\n", channel, NoteIncrs[k + KeyOctaveOffset]);
+                    PRINT("CPU0: " TERM_MAGENTA "Gate ON   Channel:%d  Incr:%d\n" TERM_RESET, channel, NoteIncrs[k + KeyOctaveOffset]);
+                    clear = 0;
                 }
             }
             else if (KeyState[k] == 3) //KeyUP
@@ -185,12 +182,53 @@ int main()
                     SYNTH_GATE_REG(channel) = 0;
                     KeyChannel[k] = (u8)-1;
 
-                    PRINT("CPU0: Gate OFF  Channel:%d\n", channel);
+                    PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Channel:%d\n" TERM_RESET, channel);
+                    clear = 0;
                 }
             }
         }
 
-        count=count<450?count+1:0;
+
+        if (count == 0)
+        {
+            static u8 nl = 0;
+            if (clear) { TERM_MOVE_UP(nl); }
+            nl = 0;
+
+            PRINT("\n"); nl++;
+            for (u8 k=0; k<sizeof(KeyState); k++)
+            {
+                PRINT("C \0C#\0D \0D#\0E \0F \0F#\0G \0G#\0A \0A#\0B \0"+3*(k%12));
+            }
+            PRINT("\n"); nl++;
+            for (u8 k=0; k<sizeof(KeyState); k++)
+            {
+                PRINT("%s%d ", KeyState[k]?TERM_CYAN:TERM_RESET, KeyState[k]);
+            }
+            PRINT(TERM_RESET "\n"); nl++;
+
+            for (u8 c=0; c<MAX_CHANNELS; c++)
+            {
+                if (SYNTH_RUNNING_REG(c))
+                {
+                    PRINT("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(c), SYNTH_ADSR_STATE_REG(c), SYNTH_INCR_REG(c));
+                }
+                else
+                {
+                    PRINT("[%2d]:OFF         ", c);
+                }
+                if (c%8==7)
+                {
+                    PRINT("\n"); nl++;
+                }
+            }
+            PRINT("\n"); nl++;
+            PRINT("\n"); nl++;
+            
+            clear = 1;
+        }
+
+        count=count<200?count+1:0;
     }
 
 
