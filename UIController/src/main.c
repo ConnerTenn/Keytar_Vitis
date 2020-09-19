@@ -20,8 +20,11 @@
 #include "xil_mmu.h"
 #include "sleep.h"
 
-#include "Video/Sil9022.h"
-#include "Video/VideoDMA.h"
+#include "Sil9022.h"
+#include "VideoDMA.h"
+
+
+#include "lvgl/lvgl.h"
 
 
 

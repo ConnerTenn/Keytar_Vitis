@@ -7,7 +7,7 @@
  * THIS FILE WAS ORIGINALLY COPIED from `/lvgl/lv_conf_template.h`
  */
 
-#if 0 /*Set it to "1" to enable content*/
+#if 1 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -20,8 +20,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (480)
-#define LV_VER_RES_MAX          (320)
+#define LV_HOR_RES_MAX          (1920)
+#define LV_VER_RES_MAX          (1080)
 
 /* Color depth:
  * - 1:  1 byte per pixel

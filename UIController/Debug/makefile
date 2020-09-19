@@ -8,6 +8,19 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include src/Video/lvgl/tests/lv_test_widgets/subdir.mk
+-include src/Video/lvgl/tests/lv_test_fonts/subdir.mk
+-include src/Video/lvgl/tests/lv_test_core/subdir.mk
+-include src/Video/lvgl/tests/subdir.mk
+-include src/Video/lvgl/src/lv_widgets/subdir.mk
+-include src/Video/lvgl/src/lv_themes/subdir.mk
+-include src/Video/lvgl/src/lv_misc/subdir.mk
+-include src/Video/lvgl/src/lv_hal/subdir.mk
+-include src/Video/lvgl/src/lv_gpu/subdir.mk
+-include src/Video/lvgl/src/lv_font/subdir.mk
+-include src/Video/lvgl/src/lv_draw/subdir.mk
+-include src/Video/lvgl/src/lv_core/subdir.mk
+-include src/Video/lvgl/examples/porting/subdir.mk
 -include src/Video/subdir.mk
 -include src/subdir.mk
 -include subdir.mk

@@ -25,9 +25,12 @@ Folder: SynthController/src/
 		Video/VideoDMA.c
 		Video/VideoDMA.h
 	Group 2
+		Video/lvgl.h
 		Video/lv_conf.h
 	
 ## Editor 3
 Folder: ZTurnPlatform/
-
+	ps7_cortexa9_1/core1/bsp/ps7_cortexa9_1/include/xil_mmu.h
+	ps7_cortexa9_1/core1/bsp/ps7_cortexa9_1/include/xscutimer.h
+	ps7_cortexa9_1/core1/bsp/ps7_cortexa9_1/include/xscutimer_hw
 
