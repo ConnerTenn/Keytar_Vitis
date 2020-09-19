@@ -1,0 +1,3 @@
+[submodule "UIController/src/Video/lvgl"]
+	path = UIController/src/Video/lvgl
+	url = https://github.com/lvgl/lvgl.git
