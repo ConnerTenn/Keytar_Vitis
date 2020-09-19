@@ -77,12 +77,12 @@ int Init()
 void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_t *color_p)
 {
     u8 fb = -1;
-    if ((u32)color_p == VIDEO_FRAME_BUFFER_ADDR(0)) { fb = 0; }
-    else if ((u32)color_p == VIDEO_FRAME_BUFFER_ADDR(1)) { fb = 1; }
+    if (VIDEO_FRAME_BUFFER_ADDR(0) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(0)+1920*1080*2) { fb = 0; }
+    else if (VIDEO_FRAME_BUFFER_ADDR(1) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(1)+1920*1080*2) { fb = 1; }
 
     if (fb <= 1)
     {
-        Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb), 1080*1920*2);
+        Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*(area->y1), 1920*2*(area->y2-area->y1));
         VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = fb;
     }
     else
@@ -109,7 +109,7 @@ int main()
 
     PRINT("CPU1: Setting up display!\n");
     lv_disp_buf_t dispBuf; //Display Buffer descriptor
-    lv_disp_buf_init(&dispBuf, (void *)VIDEO_FRAME_BUFFER_ADDR(0), (void *)VIDEO_FRAME_BUFFER_ADDR(1), 1080*1920*2);
+    lv_disp_buf_init(&dispBuf, (void *)VIDEO_FRAME_BUFFER_ADDR(0), (void *)VIDEO_FRAME_BUFFER_ADDR(1), 1080*1920);
 
     lv_disp_drv_t dispDrv; //Display Driver descriptor
     lv_disp_drv_init(&dispDrv);
@@ -118,7 +118,7 @@ int main()
 
     //Register the driver and save pointer to the created display
     lv_disp_t *display = lv_disp_drv_register(&dispDrv);
-    (void *)display; //Disable unused variable warning
+    (void)display; //Disable unused variable warning
 
     lv_obj_t *screen = lv_scr_act();
 
@@ -130,10 +130,20 @@ int main()
 
     PRINT("CPU1: Begin mainloop\n");
     // uint32_t count = 0;
+    lv_coord_t x = 0, y = 0;
+    u8 dirx=1, diry = 1;
     while (1)
     {
         // PRINT("CPU1: %lu\n", count++);
         // Draw();
+
+        if (dirx) { x++; if (x>=1920-100) { dirx=0; } }
+        else { x--; if (x==0) { dirx=1; } }
+
+        if (diry) { y++; if (y>=1080-50) { diry=0; } }
+        else { y--; if (y==0) { diry=1; } }
+
+        lv_obj_set_pos(rect, x, y);
 
 
         lv_tick_inc(1); //Increment 1 ms
