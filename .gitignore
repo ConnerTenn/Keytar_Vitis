@@ -19,3 +19,7 @@
 
 #== Files ==
 .analytics
+
+Synth_system/Debug/.Xil/xsa.xml
+
+*.checksum
