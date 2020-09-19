@@ -31,7 +31,12 @@
 int Init()
 {
     //Disable cache on OCM
+    /** @todo Change to Macros. xil_mmu.h*/
     Xil_SetTlbAttributes(SHARED_ADDR,0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
+
+    InitVideoDMA();
+    
+    Sil9022Init();
 
     return XST_SUCCESS;
 }
@@ -60,42 +65,35 @@ void Draw()
     }
     FlipBuffers();
 
+    // PRINT("CPU1: VDMA Status 0x%08X    Video Status 0x%08X    Video Signals 0x%01X    FIFO Level %d\n", VDMA_MM2S_STATUS_REG, VCTL_VDMA_STATUS_REG, VCTL_SIGNALS_REG, VCTL_FIFO_LEVEL_REG);
+    // PRINT("CPU1: Set Frame Ptr %d\n", VCTL_FRAME_PTR_REG);
+    // PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
+
     counter+=5;
 }
 
 int main()
 {
+    PRINT("CPU1: Start!\n");
+
     if (Init() != XST_SUCCESS)
     {
         PRINT("CPU1: Init Failed\n");
         return XST_FAILURE;
     }
-    PRINT("CPU1: Start!\n");
 
-    
-    InitVideoDMA();
-    
-    Sil9022Init();
+    PRINT("CPU1: Initialized!\n");
+    // usleep(500*1000); //500ms
 
 
-    usleep(500*1000); //500ms
-    
-
+    PRINT("CPU1: Begin mainloop\n");
     // uint32_t count = 0;
     while (1)
     {
-        // if (count%4==0) { VCTL_FRAME_PTR_REG = 1-VCTL_FRAME_PTR_REG; }
-        // if (count%4==0) { VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = 1 - VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef; }
-    
         // PRINT("CPU1: %lu\n", count++);
 
         Draw();
-        
-        // PRINT("CPU1: VDMA Status 0x%08X    Video Status 0x%08X    Video Signals 0x%01X    FIFO Level %d\n", VDMA_MM2S_STATUS_REG, VCTL_VDMA_STATUS_REG, VCTL_SIGNALS_REG, VCTL_FIFO_LEVEL_REG);
-        // PRINT("CPU1: Set Frame Ptr %d\n", VCTL_FRAME_PTR_REG);
-        // PRINT("CPU1: VDMA Frame Ptr %d\n", VCTL_VDMA_FRAME_PTR_REG);
 
-        // usleep(100*1000); //2000ms
 
     }
 
