@@ -35,12 +35,25 @@
 #define PRINT_MUTEX_OFF (0x0000)
 #define PRINT_MUTEX_ADDR (SHARED_ADDR+PRINT_MUTEX_OFF)
 
+#define PRINT_GETLOCK  \
+    ({ \
+        while (In8(PRINT_MUTEX_ADDR)) {} \
+        Out8(PRINT_MUTEX_ADDR, 1); \
+    })
+#define PRINT_RELEASELOCK  \
+    ({ \
+        Out8(PRINT_MUTEX_ADDR, 0); \
+    })
 #define PRINT(...) \
     ({ \
         while (In8(PRINT_MUTEX_ADDR)) {} \
         Out8(PRINT_MUTEX_ADDR, 1); \
         xil_printf(__VA_ARGS__); \
         Out8(PRINT_MUTEX_ADDR, 0); \
+    })
+#define PRINT_NOLOCK(...) \
+    ({ \
+        xil_printf(__VA_ARGS__); \
     })
 
 #define TERM_RESET   "\e[m"
@@ -56,6 +69,6 @@
 
 #define TERM_MOVE_UP(n)\
     ({ \
-        PRINT("\e[%dF", (n)); \
+        PRINT_NOLOCK("\e[%dF", (n)); \
     })
 

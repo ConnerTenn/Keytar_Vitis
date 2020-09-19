@@ -191,41 +191,45 @@ int main()
 
         if (count == 0)
         {
+            PRINT_GETLOCK;
+
             static u8 nl = 0;
             if (clear) { TERM_MOVE_UP(nl); }
             nl = 0;
 
-            PRINT("\n"); nl++;
+            PRINT_NOLOCK("\n"); nl++;
             for (u8 k=0; k<sizeof(KeyState); k++)
             {
-                PRINT("C \0C#\0D \0D#\0E \0F \0F#\0G \0G#\0A \0A#\0B \0"+3*(k%12));
+                PRINT_NOLOCK("C \0C#\0D \0D#\0E \0F \0F#\0G \0G#\0A \0A#\0B \0"+3*(k%12));
             }
-            PRINT("\n"); nl++;
+            PRINT_NOLOCK("\n"); nl++;
             for (u8 k=0; k<sizeof(KeyState); k++)
             {
-                PRINT("%s%d ", KeyState[k]?TERM_CYAN:TERM_RESET, KeyState[k]);
+                PRINT_NOLOCK("%s%d ", KeyState[k]?TERM_CYAN:TERM_RESET, KeyState[k]);
             }
-            PRINT(TERM_RESET "\n"); nl++;
+            PRINT_NOLOCK(TERM_RESET "\n"); nl++;
 
             for (u8 c=0; c<MAX_CHANNELS; c++)
             {
                 if (SYNTH_RUNNING_REG(c))
                 {
-                    PRINT("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(c), SYNTH_ADSR_STATE_REG(c), SYNTH_INCR_REG(c));
+                    PRINT_NOLOCK("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(c), SYNTH_ADSR_STATE_REG(c), SYNTH_INCR_REG(c));
                 }
                 else
                 {
-                    PRINT("[%2d]:OFF         ", c);
+                    PRINT_NOLOCK("[%2d]:OFF         ", c);
                 }
                 if (c%8==7)
                 {
-                    PRINT("\n"); nl++;
+                    PRINT_NOLOCK("\n"); nl++;
                 }
             }
-            PRINT("\n"); nl++;
-            PRINT("\n"); nl++;
+            PRINT_NOLOCK("\n"); nl++;
+            PRINT_NOLOCK("\n"); nl++;
             
             clear = 1;
+            
+            PRINT_RELEASELOCK;
         }
 
         count=count<200?count+1:0;

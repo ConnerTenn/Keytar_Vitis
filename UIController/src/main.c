@@ -85,6 +85,10 @@ void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_
         Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb), 1080*1920*2);
         VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = fb;
     }
+    else
+    {
+        PRINT("CPU1:" TERM_RED "ERROR: Flush called for invalid address\n" TERM_RESET);
+    }
 
     lv_disp_flush_ready(dispDrv);
 }
