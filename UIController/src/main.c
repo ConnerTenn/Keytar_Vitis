@@ -74,8 +74,6 @@ int Init()
 //     counter+=5;
 // }
 
-lv_disp_t *Display;
-
 void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_t *color_p)
 {
     u8 fb = -1;
@@ -115,7 +113,15 @@ int main()
     dispDrv.flush_cb = FlushCallback; //Attach Flush Callback
 
     //Register the driver and save pointer to the created display
-    Display = lv_disp_drv_register(&dispDrv);
+    lv_disp_t *display = lv_disp_drv_register(&dispDrv);
+    (void *)display; //Disable unused variable warning
+
+    lv_obj_t *screen = lv_scr_act();
+
+    lv_obj_t *rect = lv_obj_create(screen, NULL);
+    lv_obj_set_style_local_bg_color(rect, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, lv_color_hex(0x00FFFF));
+    lv_obj_set_size(rect, 100, 50);
+
 
 
     PRINT("CPU1: Begin mainloop\n");
@@ -124,6 +130,7 @@ int main()
     {
         // PRINT("CPU1: %lu\n", count++);
         // Draw();
+
 
         lv_tick_inc(1); //Increment 1 ms
 
