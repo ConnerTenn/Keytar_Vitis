@@ -90,6 +90,12 @@ void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_
         PRINT("CPU1:" TERM_RED "ERROR: Flush called for invalid address\n" TERM_RESET);
     }
 
+
+    if (area->x2-area->x1<1000 || area->y2-area->y1<1000)
+    {
+        PRINT("CPU1:" TERM_YELLOW "WARNING: Flush area less than screen size\n" TERM_RESET);
+    }
+
     lv_disp_flush_ready(dispDrv);
 }
 
@@ -120,30 +126,45 @@ int main()
     lv_disp_t *display = lv_disp_drv_register(&dispDrv);
     (void)display; //Disable unused variable warning
 
+    //Initialize Styles
+    lv_style_t roundStyle;
+    lv_style_init(&roundStyle);
+    lv_style_set_radius(&roundStyle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+    lv_style_set_bg_color(&roundStyle, LV_STATE_DEFAULT, LV_THEME_DEFAULT_COLOR_PRIMARY);
+
+    //Initialize Display Objects
     lv_obj_t *screen = lv_scr_act();
+    lv_obj_set_style_local_bg_color(screen, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     lv_obj_t *rect = lv_obj_create(screen, NULL);
-    lv_obj_set_style_local_bg_color(rect, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, lv_color_hex(0x00FFFF));
-    lv_obj_set_size(rect, 100, 50);
+    lv_obj_set_size(rect, 400, 200);
+
+    lv_obj_t *dot = lv_obj_create(rect, NULL);
+    lv_obj_add_style(dot, LV_OBJ_PART_MAIN, &roundStyle);
+    lv_obj_set_size(dot, 50, 50);
 
 
 
     PRINT("CPU1: Begin mainloop\n");
     // uint32_t count = 0;
-    lv_coord_t x = 0, y = 0;
-    u8 dirx=1, diry = 1;
+    lv_coord_t rectx = 0, recty = 0;
+    lv_coord_t dotx = 0, doty = 0;
+    s8 rectvelx = 1, rectvely = 1;
+    s8 dotvelx = 1, dotvely = 1;
     while (1)
     {
         // PRINT("CPU1: %lu\n", count++);
         // Draw();
 
-        if (dirx) { x++; if (x>=1920-100) { dirx=0; } }
-        else { x--; if (x==0) { dirx=1; } }
-
-        if (diry) { y++; if (y>=1080-50) { diry=0; } }
-        else { y--; if (y==0) { diry=1; } }
-
-        lv_obj_set_pos(rect, x, y);
+        rectx+=rectvelx; recty+=rectvely;
+        if (rectx>=1920-lv_obj_get_width(rect) || rectx<=0) { rectvelx=-rectvelx; }
+        if (recty>=1080-lv_obj_get_height(rect) || recty<=0) { rectvely=-rectvely; }
+        lv_obj_set_pos(rect, rectx, recty);
+        
+        dotx+=dotvelx; doty+=dotvely;
+        if (dotx>=400-lv_obj_get_width(dot) || dotx<=0) { dotvelx=-dotvelx; }
+        if (doty>=200-lv_obj_get_height(dot) || doty<=0) { dotvely=-dotvely; }
+        lv_obj_set_pos(dot, dotx, doty);
 
 
         lv_tick_inc(1); //Increment 1 ms
