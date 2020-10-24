@@ -19,6 +19,9 @@
 #include "xpseudo_asm.h"
 #include "xil_mmu.h"
 
+#include "xil_cache.h"
+#include "xgpiops_hw.h"
+
 // #include "xil_exception.h"
 // #include "xscugic.h"
 
@@ -92,6 +95,9 @@ int main()
         PRINT("CPU0: Init Failed\n");
         return XST_FAILURE;
     }
+
+    Out32(0x30000000, 0);
+    // XGpioPs_WriteReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DIRM_OFFSET, 0);
 
     usleep(500*1000);
     
@@ -224,6 +230,18 @@ int main()
                     PRINT_NOLOCK("\n"); nl++;
                 }
             }
+
+            PRINT_NOLOCK("\n"); nl++;
+            
+            u32 high = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+3*XGPIOPS_DATA_BANK_OFFSET);
+            u32 low = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+2*XGPIOPS_DATA_BANK_OFFSET);
+            PRINT_NOLOCK("GPIO: AWReady:%d WReady:%d WData:0x%05X AResetN:%d AWReady:%d WReady:%d WriteState:%d WriteLen:%d\n", 
+                        high>>16, high&0xFFFF, low>>13, (low>>12)&1,
+                        (low>>11)&1, (low>>10)&1, (low>>8)&0x3,
+                        low&0xFF); nl++;
+            Xil_DCacheInvalidateRange(0x30000000, 4);
+            PRINT_NOLOCK("Live DDR 0x3000_0000: %d\n", In32(0x30000000)); nl++;
+            
             PRINT_NOLOCK("\n"); nl++;
             PRINT_NOLOCK("\n"); nl++;
             
