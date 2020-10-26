@@ -72,6 +72,9 @@ int Init()
 {
     //Disable cache on OCM
     Xil_SetTlbAttributes(SHARED_ADDR, 0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
+    //Disable cache on DDR segment
+    Xil_SetTlbAttributes(0x30000000, NORM_NONCACHE);
+
 
     if (InitUart(XPAR_XUARTPS_0_DEVICE_ID) != XST_SUCCESS)
     {
@@ -96,7 +99,6 @@ int main()
         return XST_FAILURE;
     }
 
-    Out32(0x30000000, 0);
     // XGpioPs_WriteReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DIRM_OFFSET, 0);
 
     usleep(500*1000);
@@ -235,12 +237,20 @@ int main()
             
             u32 high = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+3*XGPIOPS_DATA_BANK_OFFSET);
             u32 low = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+2*XGPIOPS_DATA_BANK_OFFSET);
-            PRINT_NOLOCK("GPIO: AWReady:%d WReady:%d WData:0x%05X AResetN:%d AWReady:%d WReady:%d WriteState:%d WriteLen:%d\n", 
-                        high>>16, high&0xFFFF, low>>13, (low>>12)&1,
-                        (low>>11)&1, (low>>10)&1, (low>>8)&0x3,
-                        low&0xFF); nl++;
-            Xil_DCacheInvalidateRange(0x30000000, 4);
-            PRINT_NOLOCK("Live DDR 0x3000_0000: %d\n", In32(0x30000000)); nl++;
+            PRINT_NOLOCK("GPIO: AWReady:%d ARReady:%d Val1:%d Val2:%d      \n", 
+                high>>16, high&0xFFFF, 
+                low>>16, low&0xFFFF
+                ); nl++;
+
+            static u32 val1 = 0, val2 = 400;
+            Out32(0x30000000, val1);
+            Out32(0x30000008, val2);
+            // Xil_DCacheFlushRange(0x30000000, 0x10);
+            // Xil_DCacheInvalidateRange(0x30000010, 0x08);
+            // Xil_DCacheInvalidateRange(0x30000000, 0x28);
+            PRINT_NOLOCK("%d + %d = %d\n", val1, val2, (u32)In32(0x30000010)); nl++;
+            for (u8 i = 0; i < 10; i++) { PRINT_NOLOCK("0x%08X ", (u32)In32(0x30000000+i*4)); } PRINT_NOLOCK("        \n"); nl++;
+            val1++; val2++;
             
             PRINT_NOLOCK("\n"); nl++;
             PRINT_NOLOCK("\n"); nl++;
