@@ -235,22 +235,22 @@ int main()
 
             PRINT_NOLOCK("\n"); nl++;
             
-            u32 high = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+3*XGPIOPS_DATA_BANK_OFFSET);
-            u32 low = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+2*XGPIOPS_DATA_BANK_OFFSET);
-            PRINT_NOLOCK("GPIO: AWReady:%d ARReady:%d Val1:%d Val2:%d      \n", 
-                high>>16, high&0xFFFF, 
-                low>>16, low&0xFFFF
-                ); nl++;
+            // u32 high = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+3*XGPIOPS_DATA_BANK_OFFSET);
+            // u32 low = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+2*XGPIOPS_DATA_BANK_OFFSET);
+            // PRINT_NOLOCK("GPIO: AWReady:%d ARReady:%d Val1:%d Val2:%d      \n", 
+            //     high>>16, high&0xFFFF, 
+            //     low>>16, low&0xFFFF
+            //     ); nl++;
 
-            static u32 val1 = 0, val2 = 400;
-            Out32(0x30000000, val1);
-            Out32(0x30000008, val2);
-            // Xil_DCacheFlushRange(0x30000000, 0x10);
-            // Xil_DCacheInvalidateRange(0x30000010, 0x08);
-            // Xil_DCacheInvalidateRange(0x30000000, 0x28);
-            PRINT_NOLOCK("%d + %d = %d\n", val1, val2, (u32)In32(0x30000010)); nl++;
-            for (u8 i = 0; i < 10; i++) { PRINT_NOLOCK("0x%08X ", (u32)In32(0x30000000+i*4)); } PRINT_NOLOCK("        \n"); nl++;
-            val1++; val2++;
+            // static u32 val1 = 0, val2 = 400;
+            // Out32(0x30000000, val1);
+            // Out32(0x30000008, val2);
+            // // Xil_DCacheFlushRange(0x30000000, 0x10);
+            // // Xil_DCacheInvalidateRange(0x30000010, 0x08);
+            // // Xil_DCacheInvalidateRange(0x30000000, 0x28);
+            // PRINT_NOLOCK("%d + %d = %d\n", val1, val2, (u32)In32(0x30000010)); nl++;
+            // for (u8 i = 0; i < 10; i++) { PRINT_NOLOCK("0x%08X ", (u32)In32(0x30000000+i*4)); } PRINT_NOLOCK("        \n"); nl++;
+            // val1++; val2++;
             
             PRINT_NOLOCK("\n"); nl++;
             PRINT_NOLOCK("\n"); nl++;

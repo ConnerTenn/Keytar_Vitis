@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="UIController" location="Z:/Projects/Keytar/VitisWorkspace/UIController" platform="Z:/Projects/Keytar/VitisWorkspace/ZTurnPlatform/export/ZTurnPlatform/ZTurnPlatform.xpfm" platformUID="xilinx:::0.0(custom)" systemProject="Synth_system" sysConfig="ZTurnPlatform" runtime="C/C++" cpu="core1" cpuInstance="ps7_cortexa9_1" os="standalone" mssSignature="4763b07230a3b6a6b0ae48cb72becd29">
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="UIController" location="Z:/Projects/Keytar/VitisWorkspace/UIController" platform="Z:/Projects/Keytar/VitisWorkspace/ZTurnPlatform/export/ZTurnPlatform/ZTurnPlatform.xpfm" platformUID="xilinx:::0.0(custom)" systemProject="Synth_system" sysConfig="ZTurnPlatform" runtime="C/C++" cpu="core1" cpuInstance="ps7_cortexa9_1" os="standalone" mssSignature="56389fc6e3f75225817fdf1c9c6e186e">
   <configuration name="Debug" id="xilinx.gnu.armv7.exe.debug.1171134730">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
     <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>

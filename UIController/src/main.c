@@ -21,7 +21,7 @@
 #include "sleep.h"
 
 #include "Sil9022.h"
-#include "VideoDMA.h"
+#include "VideoController.h"
 
 
 #include "lvgl/lvgl.h"
@@ -34,7 +34,7 @@ int Init()
     /** @todo Change to Macros. xil_mmu.h*/
     Xil_SetTlbAttributes(SHARED_ADDR,0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
 
-    InitVideoDMA();
+    InitVideoController();
     
     Sil9022Init();
 
@@ -76,25 +76,25 @@ int Init()
 
 void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_t *color_p)
 {
-    u8 fb = -1;
-    if (VIDEO_FRAME_BUFFER_ADDR(0) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(0)+1920*1080*2) { fb = 0; }
-    else if (VIDEO_FRAME_BUFFER_ADDR(1) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(1)+1920*1080*2) { fb = 1; }
+    // u8 fb = -1;
+    // if (VIDEO_FRAME_BUFFER_ADDR(0) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(0)+1920*1080*2) { fb = 0; }
+    // else if (VIDEO_FRAME_BUFFER_ADDR(1) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(1)+1920*1080*2) { fb = 1; }
 
-    if (fb <= 1)
-    {
-        Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*(area->y1), 1920*2*(area->y2-area->y1));
-        VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = fb;
-    }
-    else
-    {
-        PRINT("CPU1:" TERM_RED "ERROR: Flush called for invalid address\n" TERM_RESET);
-    }
+    // if (fb <= 1)
+    // {
+    //     Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*(area->y1), 1920*2*(area->y2-area->y1));
+    //     VDMA_PARK_PTR_ST.ParkPtr.Bitwise.ReadFramePtrRef = fb;
+    // }
+    // else
+    // {
+    //     PRINT("CPU1:" TERM_RED "ERROR: Flush called for invalid address\n" TERM_RESET);
+    // }
 
 
-    if (area->x2-area->x1<1000 || area->y2-area->y1<1000)
-    {
-        PRINT("CPU1:" TERM_YELLOW "WARNING: Flush area less than screen size\n" TERM_RESET);
-    }
+    // if (area->x2-area->x1<1000 || area->y2-area->y1<1000)
+    // {
+    //     PRINT("CPU1:" TERM_YELLOW "WARNING: Flush area less than screen size\n" TERM_RESET);
+    // }
 
     lv_disp_flush_ready(dispDrv);
 }
