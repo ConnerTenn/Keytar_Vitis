@@ -11,7 +11,7 @@ ZTurnPlatform
     <sdx:systemConfigurations sdx:defaultConfiguration="ZTurnPlatform">
         <sdx:configuration sdx:name="ZTurnPlatform"
                            sdx:displayName="ZTurnPlatform"
-                           sdx:defaultProcessorGroup="core1"
+                           sdx:defaultProcessorGroup="ps7_cortexa9_1"
                            sdx:runtimes="cpp">
             <sdx:description>ZTurnPlatform</sdx:description>
             <sdx:bootImages sdx:default="standard">
@@ -20,37 +20,37 @@ ZTurnPlatform
                             sdx:readme="ZTurnPlatform/boot/generic.readme"
                             sdx:qemuArguments="ZTurnPlatform/qemu/qemu_args.txt"
                             />
-                <sdx:image sdx:name="core0"
+                <sdx:image sdx:name="standalone_domain"
                             sdx:bif="ZTurnPlatform/boot/ZTurnPlatform.bif"
                             sdx:readme="ZTurnPlatform/boot/generic.readme"
-                            sdx:qemuArguments="ZTurnPlatform/core0/qemu/qemu_args.txt"
+                            sdx:qemuArguments="ZTurnPlatform/standalone_domain/qemu/qemu_args.txt"
                             />
-                <sdx:image sdx:name="core1"
+                <sdx:image sdx:name="ps7_cortexa9_1"
                             sdx:bif="ZTurnPlatform/boot/ZTurnPlatform.bif"
                             sdx:readme="ZTurnPlatform/boot/generic.readme"
-                            sdx:qemuArguments="ZTurnPlatform/core1/qemu/qemu_args.txt"
+                            sdx:qemuArguments="ZTurnPlatform/ps7_cortexa9_1/qemu/qemu_args.txt"
                             />
             </sdx:bootImages>
-            <sdx:processorGroup sdx:name="core0"
-                                sdx:displayName="core0"
+            <sdx:processorGroup sdx:name="standalone_domain"
+                                sdx:displayName="standalone on ps7_cortexa9_0"
                                 sdx:cpuType="cortex-a9"
                                 sdx:cpuInstance="ps7_cortexa9_0">
                 <sdx:os sdx:name="standalone"
                         sdx:displayName="standalone"
-                        sdx:bspLibraryPaths="ZTurnPlatform/core0/bsplib/lib"
-                        sdx:bspIncludePaths="ZTurnPlatform/core0/bspinclude/include"
-                        sdx:bspConfig="ZTurnPlatform/core0/system.mss"
+                        sdx:bspLibraryPaths="ZTurnPlatform/standalone_domain/bsplib/lib"
+                        sdx:bspIncludePaths="ZTurnPlatform/standalone_domain/bspinclude/include"
+                        sdx:bspConfig="ZTurnPlatform/standalone_domain/system.mss"
                 />
             </sdx:processorGroup>
-            <sdx:processorGroup sdx:name="core1"
-                                sdx:displayName="core1"
+            <sdx:processorGroup sdx:name="ps7_cortexa9_1"
+                                sdx:displayName="Standalone on ps7_cortexa9_1"
                                 sdx:cpuType="cortex-a9"
                                 sdx:cpuInstance="ps7_cortexa9_1">
                 <sdx:os sdx:name="standalone"
                         sdx:displayName="standalone"
-                        sdx:bspLibraryPaths="ZTurnPlatform/core1/bsplib/lib"
-                        sdx:bspIncludePaths="ZTurnPlatform/core1/bspinclude/include"
-                        sdx:bspConfig="ZTurnPlatform/core1/system.mss"
+                        sdx:bspLibraryPaths="ZTurnPlatform/ps7_cortexa9_1/bsplib/lib"
+                        sdx:bspIncludePaths="ZTurnPlatform/ps7_cortexa9_1/bspinclude/include"
+                        sdx:bspConfig="ZTurnPlatform/ps7_cortexa9_1/system.mss"
                 />
             </sdx:processorGroup>
         </sdx:configuration>

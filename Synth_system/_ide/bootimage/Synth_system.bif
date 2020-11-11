@@ -1,8 +1,0 @@
-//arch = zynq; split = false; format = BIN
-the_ROM_image:
-{
-	[bootloader]Z:/Projects/Keytar/VitisWorkspace/ZTurnPlatform/export/ZTurnPlatform/sw/ZTurnPlatform/boot/fsbl.elf
-	Z:/Projects/Keytar/VitisWorkspace/SynthController/_ide/bitstream/system_wrapper.bit
-	Z:/Projects/Keytar/VitisWorkspace/SynthController/Debug/SynthController.elf
-	Z:/Projects/Keytar/VitisWorkspace/UIController/Debug/UIController.elf
-}

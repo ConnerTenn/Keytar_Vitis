@@ -804,7 +804,7 @@ u32 LoadPartitionsHeaderInfo(u32 PartHeaderOffset,  PartHeader *Header)
 ******************************************************************************/
 void HeaderDump(PartHeader *Header)
 {
-	fsbl_printf(DEBUG_INFO, "\r\n== Header Dump ==\r\n");
+	fsbl_printf(DEBUG_INFO, "Header Dump\r\n");
 	fsbl_printf(DEBUG_INFO, "Image Word Len: 0x%08lx\r\n",
 									Header->ImageWordLen);
 	fsbl_printf(DEBUG_INFO, "Data Word Len: 0x%08lx\r\n",
