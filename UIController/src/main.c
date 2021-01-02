@@ -35,7 +35,7 @@ int Init()
     Xil_SetTlbAttributes(SHARED_ADDR,0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
 
     InitVideoController();
-    
+
     Sil9022Init();
 
     lv_init();
@@ -76,9 +76,40 @@ int Init()
 
 void FlushCallback(struct _disp_drv_t *dispDrv, const lv_area_t *area, lv_color_t *color_p)
 {
-    // u8 fb = -1;
-    // if (VIDEO_FRAME_BUFFER_ADDR(0) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(0)+1920*1080*2) { fb = 0; }
-    // else if (VIDEO_FRAME_BUFFER_ADDR(1) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(1)+1920*1080*2) { fb = 1; }
+    u8 fb = -1;
+    if (VIDEO_FRAME_BUFFER_ADDR(0) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(0)+1920*1080*2) { fb = 0; }
+    else if (VIDEO_FRAME_BUFFER_ADDR(1) <= (u32)color_p && (u32)color_p <= VIDEO_FRAME_BUFFER_ADDR(1)+1920*1080*2) { fb = 1; }
+
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)-3*16) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)-4*16) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)-5*16) = 0b0000011111100000;
+
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+2*1) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+2*2) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+2*3) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*2) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*3) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*3+2*3) = 0b0000011111100000;
+    Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*3+2*4) = 0b0000011111100000;
+
+    for (int i=0; i<64; i++)
+    {
+        Reg16(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*(1080-2)+(1920-i*10-1)*2) = 0b0000011111100000;
+    }
+
+    if (fb <= 1)
+    {
+        // PRINT("CPU1: Flush FB:%d\n" TERM_RESET, fb);
+        // Xil_DCacheFlushRange(VIDEO_FRAME_BUFFER_ADDR(fb)+1920*2*(area->y1), 1920*2*(area->y2-area->y1));
+        VIDEO_CTRL_FBSELECT_REG = fb;
+        while (VIDEO_CTRL_FBSELECT_REG != fb) {}
+    }
+    else
+    {
+        PRINT("CPU1:" TERM_RED "ERROR: Flush called for invalid address\n" TERM_RESET);
+    }
 
     // if (fb <= 1)
     // {
@@ -132,6 +163,14 @@ int main()
     lv_style_set_radius(&roundStyle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_bg_color(&roundStyle, LV_STATE_DEFAULT, LV_THEME_DEFAULT_COLOR_PRIMARY);
 
+    lv_style_t textStyle1;
+    lv_style_init(&textStyle1);
+    lv_style_set_text_font(&textStyle1, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+
+    lv_style_t textStyle2;
+    lv_style_init(&textStyle2);
+    lv_style_set_text_font(&textStyle2, LV_STATE_DEFAULT, &lv_font_montserrat_28);
+
     //Initialize Display Objects
     lv_obj_t *screen = lv_scr_act();
     lv_obj_set_style_local_bg_color(screen, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -139,9 +178,28 @@ int main()
     lv_obj_t *rect = lv_obj_create(screen, NULL);
     lv_obj_set_size(rect, 400, 200);
 
+    lv_obj_t *rect2 = lv_obj_create(screen, NULL);
+    lv_obj_set_size(rect2, 400, 200);
+
     lv_obj_t *dot = lv_obj_create(rect, NULL);
     lv_obj_add_style(dot, LV_OBJ_PART_MAIN, &roundStyle);
     lv_obj_set_size(dot, 50, 50);
+
+    lv_obj_t * label1 = lv_label_create(screen, NULL);
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_BREAK);     /*Break the long lines*/
+    lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/
+    lv_label_set_text(label1, "#ffffff Demo abcdefghijklmnopqrstuvwxyz \\ / '");
+    lv_obj_set_width(label1, 1000);
+    lv_obj_add_style(label1, LV_OBJ_PART_MAIN, &textStyle1);
+    lv_obj_align(label1, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 10);
+
+    lv_obj_t * label2 = lv_label_create(screen, NULL);
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_BREAK);     /*Break the long lines*/
+    lv_label_set_recolor(label2, true);                      /*Enable re-coloring by commands in the text*/
+    lv_label_set_text(label2, "#ffffff Demo abcdefghijklmnopqrstuvwxyz \\ / '");
+    lv_obj_set_width(label2, 1000);
+    lv_obj_add_style(label2, LV_OBJ_PART_MAIN, &textStyle2);
+    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 40);
 
 
 
