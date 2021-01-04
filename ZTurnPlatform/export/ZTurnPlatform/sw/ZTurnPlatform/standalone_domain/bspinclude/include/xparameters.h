@@ -191,6 +191,11 @@
 #define XPAR_PS7_SLCR_0_S_AXI_HIGHADDR 0xF8000FFF
 
 
+/* Definitions for peripheral SYNTH_1 */
+#define XPAR_SYNTH_1_BASEADDR 0x60000000
+#define XPAR_SYNTH_1_HIGHADDR 0x7FFFFFFF
+
+
 /******************************************************************/
 
 /* Definitions for driver GPIOPS */
