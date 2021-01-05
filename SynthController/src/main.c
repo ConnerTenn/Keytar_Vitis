@@ -111,6 +111,12 @@ int main()
         KeyChannel[k] = (u8)-1;
     }
 
+    SYNTH_ATTACK_REG(0) = 300;
+    SYNTH_WAVETYPE_REG(0) = 1;
+    SYNTH_DECAY_REG(0) = 50;
+    SYNTH_SUSTAIN_REG(0) = 0xAFFFFFFF;
+    SYNTH_RELEASE_REG(0) = 50;
+
 
     u8 clear = 0;
 
@@ -161,7 +167,7 @@ int main()
             {
                 u8 channel = 0;
 
-                while (channel<MAX_CHANNELS && SYNTH_RUNNING_REG(channel)==1)
+                while (channel<MAX_CHANNELS && SYNTH_RUNNING_REG(0,channel)==1)
                 {
                     channel++;
                 }
@@ -170,13 +176,8 @@ int main()
                 {
                     KeyChannel[k] = channel;
 
-                    SYNTH_INCR_REG(channel) = NoteIncrs[k + KeyOctaveOffset];
-                    SYNTH_ATTACK_REG(channel) = 300;
-                    SYNTH_WAVETYPE_REG(channel) = 1;
-                    SYNTH_DECAY_REG(channel) = 50;
-                    SYNTH_SUSTAIN_REG(channel) = 0xAFFFFFFF;
-                    SYNTH_RELEASE_REG(channel) = 50;
-                    SYNTH_GATE_REG(channel) = 1;
+                    SYNTH_INCR_REG(0,channel) = NoteIncrs[k + KeyOctaveOffset];
+                    SYNTH_GATE_REG(0,channel) = 1;
 
                     PRINT("CPU0: " TERM_MAGENTA "Gate ON   Channel:%d  Incr:%d\n" TERM_RESET, channel, NoteIncrs[k + KeyOctaveOffset]);
                     clear = 0;
@@ -187,7 +188,7 @@ int main()
                 u8 channel = KeyChannel[k];
                 if (channel!=(u8)-1)
                 {
-                    SYNTH_GATE_REG(channel) = 0;
+                    SYNTH_GATE_REG(0,channel) = 0;
                     KeyChannel[k] = (u8)-1;
 
                     PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Channel:%d\n" TERM_RESET, channel);
@@ -219,9 +220,9 @@ int main()
 
             for (u8 c=0; c<MAX_CHANNELS; c++)
             {
-                if (SYNTH_RUNNING_REG(c))
+                if (SYNTH_RUNNING_REG(0,c))
                 {
-                    PRINT_NOLOCK("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(c), SYNTH_ADSR_STATE_REG(c), SYNTH_INCR_REG(c));
+                    PRINT_NOLOCK("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(0,c), SYNTH_ADSR_STATE_REG(0,c), SYNTH_INCR_REG(0,c));
                 }
                 else
                 {

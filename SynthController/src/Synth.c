@@ -21,7 +21,7 @@
 u8 KeyState[61];
 u8 KeyChannel[sizeof(KeyState)];
 
-u8 KeyOctaveOffset = 15;
+u8 KeyOctaveOffset = 27;
 
 u32 NoteIncrs[96] =
 {
