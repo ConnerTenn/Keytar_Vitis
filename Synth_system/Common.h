@@ -24,9 +24,9 @@
 #define MEM32(addr) ((volatile u32 *)(addr))
 #define MEM16(addr) ((volatile u16 *)(addr))
 #define MEM8(addr) ((volatile u8 *)(addr))
-#define Reg32(reg) (*MEM32(reg))
-#define Reg16(reg) (*MEM16(reg))
-#define Reg8(reg) (*MEM8(reg))
+#define REG32(reg) (*MEM32(reg))
+#define REG16(reg) (*MEM16(reg))
+#define REG8(reg) (*MEM8(reg))
 
 
 #define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })
