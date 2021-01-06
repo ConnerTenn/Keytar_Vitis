@@ -22,6 +22,18 @@
 #define SYNTH_RELEASE_OFF (4*4)
 #define SYNTH_RELEASE_REG(bk) REG32(SYNTH_ADDR+SYNTH_BANK_OFF(bk)+SYNTH_RELEASE_OFF)
 
+#define SYNTH_LFORUN_OFF (4*5)
+#define SYNTH_LFORUN_REG(bk) REG32(SYNTH_ADDR+SYNTH_BANK_OFF(bk)+SYNTH_LFORUN_OFF)
+
+#define SYNTH_LFOINCR_OFF (4*6)
+#define SYNTH_LFOINCR_REG(bk) REG32(SYNTH_ADDR+SYNTH_BANK_OFF(bk)+SYNTH_LFOINCR_OFF)
+
+#define SYNTH_LFOAMP_OFF (4*7)
+#define SYNTH_LFOAMP_REG(bk) REG32(SYNTH_ADDR+SYNTH_BANK_OFF(bk)+SYNTH_LFOAMP_OFF)
+
+#define SYNTH_LFOWAVETYPE_OFF (4*8)
+#define SYNTH_LFOWAVETYPE_REG(bk) REG32(SYNTH_ADDR+SYNTH_BANK_OFF(bk)+SYNTH_LFOWAVETYPE_OFF)
+
 
 
 #define SYNTH_CHANNEL_OFF(ch) (0x100*(ch)+0x100)
@@ -62,7 +74,7 @@
 3: KeyUp
 */
 extern u8 KeyState[61];
-extern u8 KeyChannel[sizeof(KeyState)];
+extern u8 KeyBankChannel[sizeof(KeyState)][2];
 extern u8 KeyOctaveOffset;
 
 extern u32 NoteIncrs[96];

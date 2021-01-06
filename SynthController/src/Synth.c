@@ -19,7 +19,7 @@
 // };
 
 u8 KeyState[61];
-u8 KeyChannel[sizeof(KeyState)];
+u8 KeyBankChannel[sizeof(KeyState)][2];
 
 u8 KeyOctaveOffset = 27;
 

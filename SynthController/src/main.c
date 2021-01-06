@@ -108,14 +108,23 @@ int main()
     for (u8 k=0; k<sizeof(KeyState); k++)
     {
         KeyState[k] = 0;
-        KeyChannel[k] = (u8)-1;
+        KeyBankChannel[k][0] = (u8)-1;
+        KeyBankChannel[k][1] = (u8)-1;
     }
 
-    SYNTH_ATTACK_REG(0) = 300;
-    SYNTH_WAVETYPE_REG(0) = 1;
-    SYNTH_DECAY_REG(0) = 50;
-    SYNTH_SUSTAIN_REG(0) = 0xAFFFFFFF;
-    SYNTH_RELEASE_REG(0) = 50;
+    for (u8 b=0; b<MAX_BANKS; b++)
+    {
+        SYNTH_ATTACK_REG(b) = 1000;
+        SYNTH_WAVETYPE_REG(b) = 1;
+        SYNTH_DECAY_REG(b) = 50;
+        SYNTH_SUSTAIN_REG(b) = 0xFFFFFF;
+        SYNTH_RELEASE_REG(b) = 50;
+
+        SYNTH_LFOINCR_REG(b) = 100;
+        SYNTH_LFOAMP_REG(b) = 0x000100u;
+        SYNTH_LFORUN_REG(b) = 1;
+        SYNTH_LFOWAVETYPE_REG(b) = 2;
+    }
 
 
     u8 clear = 0;
@@ -137,6 +146,7 @@ int main()
             KEYBOARD_DRIVE_REG = 0;
             dmb(); //Wait for write to complete
             
+
             for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
             {
                 u8 *state = &KeyState[i*8+k];
@@ -161,37 +171,61 @@ int main()
             usleep(1);
         }
 
-        for (u8 k=0; k<sizeof(KeyState); k++)
+        for (u8 b=0; b<MAX_BANKS; b++)
+        {
+            if (KeyState[0] == 1) { SYNTH_WAVETYPE_REG(b) = 0; }
+            else if (KeyState[1] == 1) { SYNTH_WAVETYPE_REG(b) = 1; }
+            else if (KeyState[2] == 1) { SYNTH_WAVETYPE_REG(b) = 2; }
+            else if (KeyState[3] == 1) { SYNTH_WAVETYPE_REG(b) = 3; }
+        }
+        for (u8 k=4; k<sizeof(KeyState); k++)
         {
             if (KeyState[k] == 1) //KeyDown
             {
+                u8 bank = 0;
                 u8 channel = 0;
+                u8 found = 0;
 
-                while (channel<MAX_CHANNELS && SYNTH_RUNNING_REG(0,channel)==1)
+                while (bank<MAX_BANKS && channel<MAX_CHANNELS && !found)
                 {
-                    channel++;
+                    if (SYNTH_RUNNING_REG(bank,channel)==0)
+                    {
+                        found = 1;
+                    }
+                    else
+                    {
+                        channel++;
+                        if (channel==MAX_CHANNELS)
+                        {
+                            bank++;
+                            channel=0;
+                        }
+                    }
                 }
 
-                if (channel < MAX_CHANNELS)
+                if (bank<MAX_BANKS && channel<MAX_CHANNELS)
                 {
-                    KeyChannel[k] = channel;
+                    KeyBankChannel[k][0] = bank;
+                    KeyBankChannel[k][1] = channel;
 
-                    SYNTH_INCR_REG(0,channel) = NoteIncrs[k + KeyOctaveOffset];
-                    SYNTH_GATE_REG(0,channel) = 1;
+                    SYNTH_INCR_REG(bank,channel) = NoteIncrs[k + KeyOctaveOffset];
+                    SYNTH_GATE_REG(bank,channel) = 1;
 
-                    PRINT("CPU0: " TERM_MAGENTA "Gate ON   Channel:%d  Incr:%d\n" TERM_RESET, channel, NoteIncrs[k + KeyOctaveOffset]);
+                    PRINT("CPU0: " TERM_MAGENTA "Gate ON   Bank:%d  Channel:%d  Incr:%d\n" TERM_RESET, bank, channel, NoteIncrs[k + KeyOctaveOffset]);
                     clear = 0;
                 }
             }
             else if (KeyState[k] == 3) //KeyUP
             {
-                u8 channel = KeyChannel[k];
-                if (channel!=(u8)-1)
+                u8 bank = KeyBankChannel[k][0];
+                u8 channel = KeyBankChannel[k][1];
+                if (bank!=(u8)-1 && channel!=(u8)-1)
                 {
-                    SYNTH_GATE_REG(0,channel) = 0;
-                    KeyChannel[k] = (u8)-1;
+                    SYNTH_GATE_REG(bank,channel) = 0;
+                    KeyBankChannel[k][0] = (u8)-1;
+                    KeyBankChannel[k][1] = (u8)-1;
 
-                    PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Channel:%d\n" TERM_RESET, channel);
+                    PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Bank:%d  Channel:%d\n" TERM_RESET, bank, channel);
                     clear = 0;
                 }
             }
@@ -218,20 +252,24 @@ int main()
             }
             PRINT_NOLOCK(TERM_RESET "\n"); nl++;
 
-            for (u8 c=0; c<MAX_CHANNELS; c++)
+            for (u8 b=0; b<MAX_BANKS; b++)
             {
-                if (SYNTH_RUNNING_REG(0,c))
+                for (u8 c=0; c<MAX_CHANNELS; c++)
                 {
-                    PRINT_NOLOCK("[%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, c, SYNTH_GATE_REG(0,c), SYNTH_ADSR_STATE_REG(0,c), SYNTH_INCR_REG(0,c));
+                    if (SYNTH_RUNNING_REG(b,c))
+                    {
+                        PRINT_NOLOCK("[%d,%2d]:" TERM_CYAN "%d:%d:%6d  " TERM_RESET, b, c, SYNTH_GATE_REG(b,c), SYNTH_ADSR_STATE_REG(b,c), SYNTH_INCR_REG(b,c));
+                    }
+                    else
+                    {
+                        PRINT_NOLOCK("[%d,%2d]:OFF         ", b, c);
+                    }
+                    if (c%8==7)
+                    {
+                        PRINT_NOLOCK("\n"); nl++;
+                    }
                 }
-                else
-                {
-                    PRINT_NOLOCK("[%2d]:OFF         ", c);
-                }
-                if (c%8==7)
-                {
-                    PRINT_NOLOCK("\n"); nl++;
-                }
+                PRINT_NOLOCK("\n"); nl++;
             }
 
             PRINT_NOLOCK("\n"); nl++;
