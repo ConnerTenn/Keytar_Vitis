@@ -114,8 +114,10 @@ int main()
 
     for (u8 b=0; b<MAX_BANKS; b++)
     {
-        SYNTH_ATTACK_REG(b) = 1000;
         SYNTH_WAVETYPE_REG(b) = 1;
+        SYNTH_PULSEWIDTH_REG(b) = 0;
+
+        SYNTH_ATTACK_REG(b) = 1000;
         SYNTH_DECAY_REG(b) = 50;
         SYNTH_SUSTAIN_REG(b) = 0xFFFFFF;
         SYNTH_RELEASE_REG(b) = 50;
@@ -124,6 +126,7 @@ int main()
         SYNTH_LFOAMP_REG(b) = 0x000100u;
         SYNTH_LFORUN_REG(b) = 1;
         SYNTH_LFOWAVETYPE_REG(b) = 2;
+        SYNTH_LFOSELECTION_STRUCT(b) = (LfoSelection){.Increment=1,.PulseWidth=0};
     }
 
 
