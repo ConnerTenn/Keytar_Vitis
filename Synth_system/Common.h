@@ -29,6 +29,26 @@
 #define REG8(reg) (*MEM8(reg))
 
 
+#define REPEAT0(X)
+#define REPEAT1(X) X
+#define REPEAT2(X) REPEAT1(X) X
+#define REPEAT3(X) REPEAT2(X) X
+#define REPEAT4(X) REPEAT3(X) X
+#define REPEAT5(X) REPEAT4(X) X
+#define REPEAT6(X) REPEAT5(X) X
+#define REPEAT7(X) REPEAT6(X) X
+#define REPEAT8(X) REPEAT7(X) X
+#define REPEAT9(X) REPEAT8(X) X
+#define REPEAT10(X) REPEAT9(X) X
+
+#define REPEAT(HUNDREDS,TENS,ONES,X) \
+  REPEAT##HUNDREDS(REPEAT10(REPEAT10(X))) \
+  REPEAT##TENS(REPEAT10(X)) \
+  REPEAT##ONES(X)
+
+#define NOP asm volatile ("nop")
+
+
 #define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })
 
 

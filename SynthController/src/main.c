@@ -139,15 +139,15 @@ int main()
         for (u8 i=0; i<8; i++)
         {
             KEYBOARD_DRIVE_REG = (1<<i);
-            dmb(); //Wait for write to complete
-            usleep(100);
+            dsb(); //Wait for write to complete
+            usleep(5);
             u8 keys = KEYBOARD_SENSE_REG;
-            dmb(); //Wait for Read to complete
+            dsb(); //Wait for Read to complete
 
             // PRINT("0x%02X:0x%02X  ", KEYBOARD_DRIVE_REG, keys); dmb(); //Wait for Read to complete
 
             KEYBOARD_DRIVE_REG = 0;
-            dmb(); //Wait for write to complete
+            // dsb(); //Wait for write to complete
             
 
             for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
@@ -171,7 +171,6 @@ int main()
                     break;
                 }
             }
-            usleep(1);
         }
 
         for (u8 b=0; b<MAX_BANKS; b++)
