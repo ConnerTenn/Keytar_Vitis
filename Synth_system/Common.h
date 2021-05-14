@@ -46,7 +46,8 @@
   REPEAT##TENS(REPEAT10(X)) \
   REPEAT##ONES(X)
 
-#define NOP asm volatile ("nop")
+#define sev() asm ("sev")
+#define nop() asm volatile ("nop")
 
 
 #define ASSERT(...) ({ if ((__VA_ARGS__)!=XST_SUCCESS) { return XST_FAILURE; } })

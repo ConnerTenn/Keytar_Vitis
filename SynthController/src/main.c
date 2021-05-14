@@ -29,9 +29,8 @@
 
 #include "Synth.h"
 
+#define KEYBOARD_PRINT 1
 
-
-#define sev() __asm__("sev")
 #define CPU1STARTADDRREG 0xfffffff0
 #define CPU1IMAGEADR 0x02000000
 
@@ -118,8 +117,8 @@ int main()
         SYNTH_PULSEWIDTH_REG(b) = 0;
 
         SYNTH_ATTACK_REG(b) = 1000;
-        SYNTH_DECAY_REG(b) = 50;
-        SYNTH_SUSTAIN_REG(b) = 0xFFFFFF;
+        SYNTH_DECAY_REG(b) = 10;
+        SYNTH_SUSTAIN_REG(b) = 0x000000;
         SYNTH_RELEASE_REG(b) = 50;
 
         SYNTH_LFOINCR_REG(b) = 100;
@@ -130,9 +129,11 @@ int main()
     }
 
 
+#if KEYBOARD_PRINT
     u8 clear = 0;
-
     u32 count = 0;
+#endif
+
     while (1)
     {
         //Keyboard
@@ -214,7 +215,9 @@ int main()
                     SYNTH_GATE_REG(bank,channel) = 1;
 
                     PRINT("CPU0: " TERM_MAGENTA "Gate ON   Bank:%d  Channel:%d  Incr:%d\n" TERM_RESET, bank, channel, NoteIncrs[k + KeyOctaveOffset]);
+#if KEYBOARD_PRINT
                     clear = 0;
+#endif
                 }
             }
             else if (KeyState[k] == 3) //KeyUP
@@ -228,12 +231,15 @@ int main()
                     KeyBankChannel[k][1] = (u8)-1;
 
                     PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Bank:%d  Channel:%d\n" TERM_RESET, bank, channel);
+#if KEYBOARD_PRINT
                     clear = 0;
+#endif
                 }
             }
         }
 
 
+#if KEYBOARD_PRINT
         if (count == 0)
         {
             PRINT_GETLOCK;
@@ -302,6 +308,7 @@ int main()
         }
 
         count=count<200?count+1:0;
+#endif
     }
 
 
