@@ -29,18 +29,18 @@
 
 #include "Synth.h"
 
-#define KEYBOARD_PRINT 1
+#define KEYBOARD_PRINT 0
 
 #define CPU1STARTADDRREG 0xfffffff0
 #define CPU1IMAGEADR 0x02000000
 
 int InitCPU1()
 {
-    print("CPU0: writing startaddress for CPU1\n\r");
+    print("CPU0: writing startaddress for CPU1\n");
     Xil_Out32(CPU1STARTADDRREG, CPU1IMAGEADR);
     dmb(); //Wait for write to complete
 
-    print("CPU0: sending the SEV to wake up CPU1\n\r");
+    print("CPU0: sending the SEV to wake up CPU1\n");
     sev();
 
     return XST_SUCCESS;
@@ -67,6 +67,71 @@ int InitUart(u16 DeviceId)
     return XST_SUCCESS;
 }
 
+int InitAnalog()
+{
+    PRINT("CPU0: Initalizing DAC/ADC\n");
+    //Initialize device
+    ANALOG_CTL_RESET_REG = 1;
+    ANALOG_CTL_WRITE(0x7, 0x03);
+
+    PRINT("CPU0: Configuring DAC/ADC\n");
+
+    //Mode=0b10; Double speed (50khz-100khz)
+    //Ratio=0b00; 128x (Slave Mode)
+    //Master/Slave=0b0; Slave Mode
+    //Mode=0b001 (I2S 24 bit)
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x1, 0b10000001);
+
+    //Auto Mute=0b0; Off
+    //Filter select=0b0; Fast rolloff
+    //De-Emphasis=0b00; Disabled
+    //Soft Ramp-Up=0b0; Ramp is immediate
+    //Soft Ramp-Down=0b0; Ramp is immediate
+    //Invert Polarity=0b00; Disabled
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x2, 0b00000000);
+
+    //Reserved=0b0
+    //Combined channel volume=0b1; Combined (Controlled by channel A)
+    //Soft Ramp or Zero Cross=0b01; Zero cross enabled
+    //Channel mixing and muting=0b1001; A=Left, B=Right
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x3, 0b01011001);
+
+    //Mute=0b0
+    //Volume=0b0000000; -0dB
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x4, 0b00000000);
+
+    //Mute=0b0
+    //Volume=0b0000000; -0dB
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x5, 0b00000000);
+
+    //Reserved=0b00
+    //Dither=0b0; Dither disabled
+    //ADC Format=0b1; Format 1
+    //ADC Mute=0b00
+    //High pass filter disable=0b11; Disabled both channels
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x6, 0b00010011);
+
+    //Reserved=0b000
+    //Loopback=0b0
+    //AMute and BMute=0b0; Not combined
+    //Freeze=0b0
+    //Control Port Enable=0b1
+    //Power Down=0b0; Power Up!
+    ANALOG_CTL_SYNC();
+    ANALOG_CTL_WRITE(0x7, 0b00000010);
+
+
+    PRINT("CPU0: DAC/ADC Configured\n");
+
+    return XST_SUCCESS;
+}
+
 int Init()
 {
     //Disable cache on OCM
@@ -84,6 +149,12 @@ int Init()
     if (InitCPU1() != XST_SUCCESS)
     {
         PRINT("CPU0: Filed to initialize CPU 1\n");
+        return XST_FAILURE;
+    }
+
+    if (InitAnalog() != XST_SUCCESS)
+    {
+        PRINT("CPU0: Filed to initialize the DAC/ADC\n");
         return XST_FAILURE;
     }
 
@@ -111,7 +182,7 @@ int main()
         KeyBankChannel[k][1] = (u8)-1;
     }
 
-    for (u8 b=0; b<MAX_BANKS; b++)
+    for (u8 b=0; b<MAX_BANKS-1; b++)
     {
         SYNTH_WAVETYPE_REG(b) = 1;
         SYNTH_PULSEWIDTH_REG(b) = 0;
@@ -127,6 +198,14 @@ int main()
         SYNTH_LFOWAVETYPE_REG(b) = 2;
         SYNTH_LFOSELECTION_STRUCT(b) = (LfoSelection){.Increment=1,.PulseWidth=0};
     }
+
+    SYNTH_WAVETYPE_REG(MAX_BANKS-1) = 1;
+    SYNTH_PULSEWIDTH_REG(MAX_BANKS-1) = 0;
+
+    SYNTH_ATTACK_REG(MAX_BANKS-1) = 1000;
+    SYNTH_DECAY_REG(MAX_BANKS-1) = 0;
+    SYNTH_SUSTAIN_REG(MAX_BANKS-1) = 0xEFFFFF;
+    SYNTH_RELEASE_REG(MAX_BANKS-1) = 50;
 
 
 #if KEYBOARD_PRINT
@@ -189,7 +268,8 @@ int main()
                 u8 channel = 0;
                 u8 found = 0;
 
-                while (bank<MAX_BANKS && channel<MAX_CHANNELS && !found)
+                //Find an unused oscillator
+                while (bank<MAX_BANKS-1 && channel<MAX_CHANNELS && !found)
                 {
                     if (SYNTH_RUNNING_REG(bank,channel)==0)
                     {
@@ -206,6 +286,7 @@ int main()
                     }
                 }
 
+                //Set the oscillator to play the note
                 if (bank<MAX_BANKS && channel<MAX_CHANNELS)
                 {
                     KeyBankChannel[k][0] = bank;
@@ -236,6 +317,45 @@ int main()
 #endif
                 }
             }
+        }
+
+        if ((s32)TOUCHSTRIP_PRESSURE_REG>(s32)(0.5*0x7FFFFF))
+        {
+            u8 bank = MAX_BANKS-1;
+            u8 channel = 0;
+
+            s32 pos = (s32)TOUCHSTRIP_POSITION_REG;
+            float upper = NoteIncrs[12*4+11];
+            float lower = NoteIncrs[12*4];
+            u32 incr = (float)pos/(0.7f*0x7FFFFF) * (upper-lower)/2.0f + (upper+lower)/2.0f;
+
+//             if (SYNTH_RUNNING_REG(bank,channel)==0)
+//             {
+//                 PRINT("CPU0: " TERM_MAGENTA "Gate ON   Bank:%d  Channel:%d  Incr:%d\n" TERM_RESET, bank, channel, incr);
+// #if KEYBOARD_PRINT
+//                 clear = 0;
+// #endif
+//             }
+
+            //Set the oscillator to play the note
+            SYNTH_INCR_REG(bank,channel) = incr;
+            SYNTH_GATE_REG(bank,channel) = 1;
+
+        }
+        else
+        {
+            u8 bank = MAX_BANKS-1;
+            u8 channel = 0;
+
+//             if (SYNTH_RUNNING_REG(bank,channel)==1)
+//             {
+//                 PRINT("CPU0: " TERM_MAGENTA "Gate OFF  Bank:%d  Channel:%d\n" TERM_RESET, bank, channel);
+// #if KEYBOARD_PRINT
+//                 clear = 0;
+// #endif
+//             }
+
+            SYNTH_GATE_REG(bank,channel) = 0;
         }
 
 
@@ -281,24 +401,12 @@ int main()
             }
 
             PRINT_NOLOCK("\n"); nl++;
-            
-            // u32 high = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+3*XGPIOPS_DATA_BANK_OFFSET);
-            // u32 low = XGpioPs_ReadReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DATA_RO_OFFSET+2*XGPIOPS_DATA_BANK_OFFSET);
-            // PRINT_NOLOCK("GPIO: AWReady:%d ARReady:%d Val1:%d Val2:%d      \n", 
-            //     high>>16, high&0xFFFF, 
-            //     low>>16, low&0xFFFF
-            //     ); nl++;
 
-            // static u32 val1 = 0, val2 = 400;
-            // Out32(0x30000000, val1);
-            // Out32(0x30000008, val2);
-            // // Xil_DCacheFlushRange(0x30000000, 0x10);
-            // // Xil_DCacheInvalidateRange(0x30000010, 0x08);
-            // // Xil_DCacheInvalidateRange(0x30000000, 0x28);
-            // PRINT_NOLOCK("%d + %d = %d\n", val1, val2, (u32)In32(0x30000010)); nl++;
-            // for (u8 i = 0; i < 10; i++) { PRINT_NOLOCK("0x%08X ", (u32)In32(0x30000000+i*4)); } PRINT_NOLOCK("        \n"); nl++;
-            // val1++; val2++;
-            
+            s32 position = TOUCHSTRIP_POSITION_REG;
+            s32 pressure = TOUCHSTRIP_PRESSURE_REG;
+            PRINT_NOLOCK("Strip Position: %9d %08X  %c0.%04d\n", position, position, position>=0?'+':'-', (s32)abs(10000.0f*(float)position/(float)0x7FFFFF)); nl++;
+            PRINT_NOLOCK("Strip Pressure: %9d %08X  %c0.%04d\n", pressure, pressure, pressure>=0?'+':'-', (s32)abs(10000.0f*(float)pressure/(float)0x7FFFFF)); nl++;
+
             PRINT_NOLOCK("\n"); nl++;
             PRINT_NOLOCK("\n"); nl++;
             

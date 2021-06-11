@@ -191,6 +191,11 @@
 #define XPAR_SYNTH_HIGHADDR 0x7FFFFFFF
 
 
+/* Definitions for peripheral IOCONTROLLER_1 */
+#define XPAR_IOCONTROLLER_1_BASEADDR 0x40200000
+#define XPAR_IOCONTROLLER_1_HIGHADDR 0x40200FFF
+
+
 /******************************************************************/
 
 /* Definitions for driver GPIOPS */
