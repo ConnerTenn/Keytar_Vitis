@@ -186,14 +186,14 @@
 #define XPAR_PS7_SLCR_0_S_AXI_HIGHADDR 0xF8000FFF
 
 
-/* Definitions for peripheral SYNTH */
-#define XPAR_SYNTH_BASEADDR 0x60000000
-#define XPAR_SYNTH_HIGHADDR 0x7FFFFFFF
-
-
 /* Definitions for peripheral IOCONTROLLER_1 */
 #define XPAR_IOCONTROLLER_1_BASEADDR 0x40200000
 #define XPAR_IOCONTROLLER_1_HIGHADDR 0x40200FFF
+
+
+/* Definitions for peripheral SYNTH */
+#define XPAR_SYNTH_BASEADDR 0x60000000
+#define XPAR_SYNTH_HIGHADDR 0x7FFFFFFF
 
 
 /******************************************************************/
