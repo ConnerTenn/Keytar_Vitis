@@ -1,6 +1,6 @@
 
 #SampleRate=44800
-UpdateFreq=1_000_000/(100*2)
+UpdateFreq=1_000_000
 Bits=24
 
 notes=["A ","A$","B ","C ","C$","D ","D$","E ","F ","F$","G ","G$"]
@@ -48,6 +48,6 @@ for i in range(0,len(out)):
     if i%12==11:
         print()
     
-print("}")
+print("};")
 
 print()
