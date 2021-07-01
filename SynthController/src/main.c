@@ -218,15 +218,15 @@ int main()
         //Keyboard
         for (u8 i=0; i<8; i++)
         {
-            KEYBOARD_DRIVE_REG = (1<<i);
+            KEYBOARD_REG = (1<<i);
             dsb(); //Wait for write to complete
             usleep(5);
-            u8 keys = KEYBOARD_SENSE_REG;
+            u8 keys = KEYBOARD_REG;
             dsb(); //Wait for Read to complete
 
             // PRINT("0x%02X:0x%02X  ", KEYBOARD_DRIVE_REG, keys); dmb(); //Wait for Read to complete
 
-            KEYBOARD_DRIVE_REG = 0;
+            KEYBOARD_REG = 0;
             // dsb(); //Wait for write to complete
             
 

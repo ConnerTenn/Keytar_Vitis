@@ -89,11 +89,6 @@
 /******************************************************************/
 
 
-/* Definitions for peripheral APBSLAVE_BREAKOUT_KEYBOARD */
-#define XPAR_APBSLAVE_BREAKOUT_KEYBOARD_BASEADDR 0x40100000
-#define XPAR_APBSLAVE_BREAKOUT_KEYBOARD_HIGHADDR 0x40100FFF
-
-
 /* Definitions for peripheral VIDEOCONTROLLER_0 */
 #define XPAR_VIDEOCONTROLLER_0_BASEADDR 0x80000000
 #define XPAR_VIDEOCONTROLLER_0_HIGHADDR 0x80000FFF
@@ -186,14 +181,14 @@
 #define XPAR_PS7_SLCR_0_S_AXI_HIGHADDR 0xF8000FFF
 
 
-/* Definitions for peripheral IOCONTROLLER_1 */
-#define XPAR_IOCONTROLLER_1_BASEADDR 0x40200000
-#define XPAR_IOCONTROLLER_1_HIGHADDR 0x40200FFF
-
-
 /* Definitions for peripheral SYNTH */
 #define XPAR_SYNTH_BASEADDR 0x60000000
 #define XPAR_SYNTH_HIGHADDR 0x7FFFFFFF
+
+
+/* Definitions for peripheral IOCONTROLLER_0 */
+#define XPAR_IOCONTROLLER_0_BASEADDR 0x40000000
+#define XPAR_IOCONTROLLER_0_HIGHADDR 0x40000FFF
 
 
 /******************************************************************/
