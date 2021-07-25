@@ -184,6 +184,19 @@ int main()
 
     for (u8 b=0; b<MAX_BANKS-1; b++)
     {
+        SYNTH_FILTER_COEFF_REG(b, 0) = 0xFFF0FF;
+        // for (u8 i=1; i<MAX_FILTER_DEPTH; i++)
+        // {
+        //     SYNTH_FILTER_COEFF_REG(b, i) = 0xFFFFFF;
+        // }
+
+        PRINT("Filter Coeff: ");
+        for (u8 i=0; i<MAX_FILTER_DEPTH; i++)
+        {
+            PRINT("0x%06X ", SYNTH_FILTER_COEFF_REG(b, i));
+        }
+        PRINT("\n");
+
         SYNTH_WAVETYPE_REG(b) = 1;
         SYNTH_PULSEWIDTH_REG(b) = 0;
 
