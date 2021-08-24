@@ -1,6 +1,6 @@
 
 #SampleRate=44800
-UpdateFreq=1_000_000
+UpdateFreq=100_000
 Bits=24
 
 notes=["A ","A$","B ","C ","C$","D ","D$","E ","F ","F$","G ","G$"]
