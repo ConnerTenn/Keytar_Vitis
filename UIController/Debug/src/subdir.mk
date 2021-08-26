@@ -7,12 +7,15 @@ LD_SRCS += \
 ../src/lscript.ld 
 
 C_SRCS += \
+../src/Interrupts.c \
 ../src/main.c 
 
 OBJS += \
+./src/Interrupts.o \
 ./src/main.o 
 
 C_DEPS += \
+./src/Interrupts.d \
 ./src/main.d 
 
 

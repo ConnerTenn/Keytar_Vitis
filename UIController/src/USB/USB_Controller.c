@@ -1,8 +1,9 @@
 
 #include "USB_Controller.h"
 #include "USB_Handlers.h"
+#include "../Interrupts.h"
+
 #include "xusbps.h"
-#include "xscugic.h"
 
 
 XUsbPs USBdriver;
@@ -12,7 +13,7 @@ u8 DMAmemory[1024] ALIGN32;
 
 void InitUSB()
 {
-    PRINT("CPU1: Init USB\n");
+    PRINT("CPU1: Initialize USB\n");
 
     //== Initialize ==
     Usb_Config *config = XUsbPs_LookupConfig(XPAR_PS7_USB_0_DEVICE_ID);
@@ -20,7 +21,7 @@ void InitUSB()
 
     int status;
     status = XUsbPs_CfgInitialize(&USBdriver, config, config->BaseAddress);
-    if (XST_SUCCESS != status) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
+    if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
 
 
     //== Setup Endpoints ==
@@ -51,7 +52,7 @@ void InitUSB()
     USBconfig.DMAMemPhys = (u32)DMAmemory;
 
     status = XUsbPs_ConfigureDevice(&USBdriver, &USBconfig);
-    if (XST_SUCCESS != status) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
+    if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
 
 
     //== Setup Handlers ==
@@ -62,8 +63,13 @@ void InitUSB()
     status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_OUT, USB_SynthEventOutISOHandler);
 
     //== Setup Interrupts ==
+    //Connect the device driver interrupt handler
+    InterruptAttach(XPAR_XUSBPS_0_INTR, XUsbPs_IntrHandler, &USBdriver);
+    XUsbPs_IntrEnable(&USBdriver, XUSBPS_IXR_UR_MASK | XUSBPS_IXR_UI_MASK);
 
     //== Start ==
     XUsbPs_Start(&USBdriver);
+
+    PRINT("CPU1: USB Initialized\n");
 }
 
