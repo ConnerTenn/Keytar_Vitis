@@ -28,6 +28,11 @@
 #define REG16(reg) (*MEM16(reg))
 #define REG8(reg) (*MEM8(reg))
 
+#define ALIGN8 __attribute__ ((aligned(8)))
+#define ALIGN16 __attribute__ ((aligned(16)))
+#define ALIGN32 __attribute__ ((aligned(32)))
+#define ALIGN64 __attribute__ ((aligned(64)))
+
 
 #define REPEAT0(X)
 #define REPEAT1(X) X

@@ -20,6 +20,7 @@
 #include "xil_mmu.h"
 #include "sleep.h"
 
+#include "USB_Controller.h"
 #include "Sil9022.h"
 #include "VideoController.h"
 
@@ -33,6 +34,8 @@ int Init()
     //Disable cache on OCM
     /** @todo Change to Macros. xil_mmu.h*/
     Xil_SetTlbAttributes(SHARED_ADDR,0x14de2); //S=b1 TEX=b100 AP=b11, Domain=b1111, C=b0, B=b0
+
+    InitUSB();
 
     InitVideoController();
 

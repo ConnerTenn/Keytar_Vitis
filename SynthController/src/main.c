@@ -29,7 +29,7 @@
 
 #include "Synth.h"
 
-#define KEYBOARD_PRINT 0
+#define KEYBOARD_PRINT 1
 
 #define CPU1STARTADDRREG 0xfffffff0
 #define CPU1IMAGEADR 0x02000000
@@ -194,7 +194,7 @@ int main()
 
     // XGpioPs_WriteReg(XPAR_PS7_GPIO_0_BASEADDR, XGPIOPS_DIRM_OFFSET, 0);
 
-    usleep(500*1000);
+    usleep(500*1000); //500ms
     
     PRINT("CPU0: Begin\n");
 
@@ -214,7 +214,7 @@ int main()
 
         SYNTH_ATTACK_REG(b) = 10000;
         SYNTH_DECAY_REG(b) = 50;
-        SYNTH_SUSTAIN_REG(b) = 0x000000;
+        SYNTH_SUSTAIN_REG(b) = 0xEF0000;
         SYNTH_RELEASE_REG(b) = 300;
 
         SYNTH_LFOINCR_REG(b) = 1000;
@@ -238,8 +238,11 @@ int main()
     u32 count = 0;
 #endif
 
+    u32 dly = 0;
+
     while (1)
     {
+        dly++;
         //Keyboard
         for (u8 i=0; i<8; i++)
         {
@@ -253,7 +256,16 @@ int main()
 
             KEYBOARD_REG = 0;
             // dsb(); //Wait for write to complete
-            
+
+            if (i == 5 && ((dly%10000)>=5000))
+            {
+                keys = keys | 1;
+            }
+
+            if (i == 3 && ((dly%4000)>=2000))
+            {
+                keys = keys | 1;
+            }
 
             for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
             {

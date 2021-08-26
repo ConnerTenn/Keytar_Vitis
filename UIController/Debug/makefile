@@ -22,6 +22,7 @@ RM := rm -rf
 -include src/Video/lvgl/src/lv_core/subdir.mk
 -include src/Video/lvgl/examples/porting/subdir.mk
 -include src/Video/subdir.mk
+-include src/USB/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
