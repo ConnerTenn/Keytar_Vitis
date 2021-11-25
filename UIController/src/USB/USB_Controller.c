@@ -11,6 +11,57 @@ XUsbPs_DeviceConfig USBconfig;
 
 u8 DMAmemory[1024] ALIGN32;
 
+
+
+/*
+ * Device Descriptors
+ */
+USB_STD_DEV_DESC __attribute__ ((aligned(16))) USBDeviceDesc = {
+    /*
+     * USB 2.0
+     */
+    sizeof(USB_STD_DEV_DESC),  /* bLength */
+    XUSBPS_TYPE_DEVICE_DESC,   /* bDescriptorType */
+    0x0200,                    /* bcdUSB 2.0 */
+    XUSBPS_CLASS_VENDOR,       /* bDeviceClass */
+    0x10,                      /* bDeviceSubClass */
+    0x01,                      /* bDeviceProtocol */
+    0x40,                      /* bMaxPackedSize0 */
+    0x03Fd,                    /* idVendor */
+    0x0200,                    /* idProduct */
+    0x0100,                    /* bcdDevice */
+    0x01,                      /* iManufacturer */
+    0x02,                      /* iProduct */
+    0x03,                      /* iSerialNumber */
+    0x01                       /* bNumConfigurations */
+};
+
+USB_CONFIG __attribute__ ((aligned(16))) USBConfig = {
+    {/* Std Config*/
+        sizeof(USB_STD_CFG_DESC),  /* bLength */
+        XUSBPS_TYPE_CONFIG_DESC,   /* bDescriptorType */
+        sizeof(USB_CONFIG),        /* wTotalLength */
+        0x01,                      /* Num interfaces */
+        0x01,                      /* Num configuration values */
+        0x00,                      /* Configuration string */
+        0xC0,                      /* bmAttribute */
+        0x01                       /* bMaxPower */
+    },
+    {/* Interface Config */
+        sizeof(USB_STD_IF_DESC),  /* Interface Descriptor size 9 bytes */
+        XUSBPS_TYPE_IF_CFG_DESC,  /* This is an interface descriptor */
+        0x00,                     /* Interface number 0 */
+        0x00,                     /* Alternate set 0 */
+        0x01,                     /* Number of end points */
+        XUSBPS_CLASS_VENDOR,      /* Audio device */
+        0xE6,                     /* Audio Control */
+        0x21,                     /* Interface Protocol */
+        0x00                      /* iInterface */
+    },
+};
+
+
+
 void InitUSB()
 {
     PRINT("CPU1: Initialize USB\n");
@@ -73,3 +124,41 @@ void InitUSB()
     PRINT("CPU1: USB Initialized\n");
 }
 
+
+
+void XUsbPs_ClassReq(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
+{
+    // s32 Status;
+    // u8 Error = 0;
+    // u32 ReplyLen;
+    // static u8 Reply[XUSBPS_REQ_REPLY_LEN] ALIGNMENT_CACHELINE;
+
+
+    // switch (SetupData->bRequest) 
+    // {
+    //     default:
+    // }
+}
+
+
+u32 XUsbPs_Ch9SetupDevDescReply(u8 *bufPtr, u32 bufLen)
+{
+    /* Check buffer pointer is there and buffer is big enough. */
+    if (!bufPtr) { return 0; }
+    if (bufLen < sizeof(USB_STD_DEV_DESC)) { return 0; }
+
+    memcpy(bufPtr, &USBDeviceDesc, sizeof(USB_STD_DEV_DESC));
+
+    return sizeof(USB_STD_DEV_DESC);
+}
+
+u32 XUsbPs_Ch9SetupCfgDescReply(u8 *bufPtr, u32 bufLen)
+{
+    /* Check buffer pointer is OK and buffer is big enough. */
+    if (!bufPtr) { return 0; }
+    if (bufLen < sizeof(USB_STD_CFG_DESC)) { return 0; }
+
+    memcpy(bufPtr, (u8 *)&USBConfig, sizeof(USB_CONFIG));
+
+    return sizeof(USB_CONFIG);
+}
