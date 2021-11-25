@@ -229,7 +229,7 @@ typedef struct
 {
     u8 bLength;
     u8 bDescriptorType;
-    u16 wLANGID[1];
+    u16 wLANGID[0]; //Dynamic sized element
 }  __attribute__((__packed__))USB_STD_STRING_DESC;
 
 typedef struct

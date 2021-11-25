@@ -60,6 +60,15 @@ USB_CONFIG __attribute__ ((aligned(16))) USBConfig = {
     },
 };
 
+char *StringList[] = {
+    "UNUSED",
+    "Xilinx",
+    "Custom Synth Device",
+    "E621E926",
+    "Default Configuration",
+    "Default Interface",
+};
+
 
 
 void InitUSB()
@@ -163,9 +172,47 @@ u32 XUsbPs_Ch9SetupCfgDescReply(u8 *bufPtr, u32 bufLen)
     return sizeof(USB_CONFIG);
 }
 
-u32 XUsbPs_Ch9SetupStrDescReply(u8 *BufPtr, u32 BufLen, u8 Index)
+u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 {
-    return 0;
+    u8 buffer[128];
+    //Assign to buffer because of dynamic sized element
+    USB_STD_STRING_DESC *stringDesc = (USB_STD_STRING_DESC *)buffer;
+
+    if (!bufPtr) { return 0; }
+    if (index >= sizeof(StringList) / sizeof(char *)) { return 0; }
+
+    char *string = StringList[index];
+    u32 stringLen = strlen(string);
+
+
+    //index 0 is special as we can not represent the string required in
+    //the table above. Therefore we handle index 0 as a special case.
+    if (index==0)
+    {
+        stringDesc->bLength = 4;
+        stringDesc->bDescriptorType = XUSBPS_TYPE_STRING_DESC;
+        stringDesc->wLANGID[0] = 0x0409;
+    }
+    //All other strings can be pulled from the table above.
+    else 
+    {
+        stringDesc->bLength = stringLen * 2 + 2;
+        stringDesc->bDescriptorType = XUSBPS_TYPE_STRING_DESC;
+
+        for (int i=0; i<stringLen; i++) 
+        {
+            stringDesc->wLANGID[i] = (u16)string[i];
+        }
+    }
+    u32 descLen = stringDesc->bLength;
+
+
+    //Check if the provided buffer is big enough to hold the descriptor.
+    if (descLen > bufLen) { return 0; }
+
+    memcpy(bufPtr, stringDesc, descLen);
+
+    return descLen;
 }
 
 void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
