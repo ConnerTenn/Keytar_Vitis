@@ -20,6 +20,7 @@ void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *da
             if (status == XST_SUCCESS)
             {
                 //Handle the setup packet
+                XUsbPs_Ch9HandleSetupPacket(usbDriver, &setupData);
             }
             break;
         }
@@ -84,7 +85,7 @@ void USB_SynthEventIsoTxHandler(void *callbackRef, u32 requestedBytes, u32 bytes
     u8 buffer[] = "USB test\n";
     u32 bufferLen = sizeof(buffer);
     u32 handle;
-    XUsbPs_EpBufferSend(usbDriver, 1, &buffer, &bufferLen);
+    XUsbPs_EpBufferSend(usbDriver, 1, (const u8 *)buffer, bufferLen);
 }
 
 
