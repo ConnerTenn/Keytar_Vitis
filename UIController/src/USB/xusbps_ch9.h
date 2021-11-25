@@ -161,9 +161,96 @@ extern "C" {
 
 /**************************** Type Definitions *******************************/
 
-typedef struct {
-	u8  CurrentConfig;	/* Configuration used by Ch9 code. */
+typedef struct
+{
+    u8  CurrentConfig;	/* Configuration used by Ch9 code. */
 } XUsbPs_Local;
+
+
+/*
+* Standard USB structures as per 2.0 specification
+*/
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u16 bcdUSB;
+    u8 bDeviceClass;
+    u8 bDeviceSubClass;
+    u8 bDeviceProtocol;
+    u8 bMaxPacketSize0;
+    u16 idVendor;
+    u16 idProduct;
+    u16 bcdDevice;
+    u8 iManufacturer;
+    u8 iProduct;
+    u8 iSerialNumber;
+    u8 bNumConfigurations;
+} __attribute__((__packed__))USB_STD_DEV_DESC;
+
+typedef struct
+{
+    u8 bLength;
+    u8 bType;
+    u16 wTotalLength;
+    u8 bNumberInterfaces;
+    u8 bConfigValue;
+    u8 bIConfigString;
+    u8 bAttributes;
+    u8 bMaxPower;
+}  __attribute__((__packed__))USB_STD_CFG_DESC;
+
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u8 bInterfaceNumber;
+    u8 bAlternateSetting;
+    u8 bNumEndPoints;
+    u8 bInterfaceClass;
+    u8 bInterfaceSubClass;
+    u8 bInterfaceProtocol;
+    u8 iInterface;
+}  __attribute__((__packed__))USB_STD_IF_DESC;
+
+
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u8 bEndpointAddress;
+    u8 bmAttributes;
+    u8 bMaxPacketSizeL;
+    u8 bMaxPacketSizeH;
+    u8 bInterval;
+}  __attribute__((__packed__))USB_STD_EP_DESC;
+
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u16 wLANGID[1];
+}  __attribute__((__packed__))USB_STD_STRING_DESC;
+
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u8 bDevCapabiltyType;
+    u32 bmAttributes;
+} __attribute__((__packed__))USB_STD_DEVICE_CAP_7BYTE;
+
+typedef struct
+{
+    u8 bLength;
+    u8 bDescriptorType;
+    u8 bDevCapabiltyType;
+    u8 bmAttributes;
+    u16 wSpeedsSupported;
+    u8 bFunctionalitySupport;
+    u8 bU1DevExitLat;
+    u16 wU2DevExitLat;
+} __attribute__((__packed__))USB_STD_DEVICE_CAP_10BYTE;
 
 /***************** Macros (Inline Functions) Definitions *********************/
 #define ALIGNMENT_CACHELINE  __attribute__ ((aligned (32)))
@@ -171,8 +258,7 @@ typedef struct {
 
 /************************** Function Prototypes ******************************/
 
-int XUsbPs_Ch9HandleSetupPacket(XUsbPs *InstancePtr,
-				 XUsbPs_SetupData *SetupData);
+int XUsbPs_Ch9HandleSetupPacket(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData);
 u8 XUsbPs_GetConfigDone(void *InstancePtr);
 void XUsbPs_SetConfigDone(void *InstancePtr, u8 Flag);
 
