@@ -1,19 +1,91 @@
 
 #include "USB_Handlers.h"
 
-void USB_CtrlInHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
-{
-}
-
-void USB_CtrlOutHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
-{
-}
+#include "xusbps.h"
 
 
-void USB_SynthEventInISOHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
+
+void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
+    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+    int status;
+
+    switch (eventType)
+    {
+    //== Setup Packets ==
+    case XUSBPS_EP_EVENT_SETUP_DATA_RECEIVED:
+        {
+            XUsbPs_SetupData setupData;
+            status = XUsbPs_EpGetSetupData(usbDriver, endpointNum, &setupData);
+            if (status == XST_SUCCESS)
+            {
+                //Handle the setup packet
+            }
+            break;
+        }
+
+    //== RX Packets ==
+    case XUSBPS_EP_EVENT_DATA_RX:
+        {
+            u8 *buffer;
+            u32 bufferLen;
+            u32 handle;
+            status = XUsbPs_EpBufferReceive(usbDriver, endpointNum, &buffer, &bufferLen, &handle);
+            if (status == XST_SUCCESS)
+            {
+                XUsbPs_EpBufferRelease(handle);
+            }
+            break;
+        }
+
+    //== Unhandled Events ==
+    default:
+        break;
+    }
 }
 
-void USB_SynthEventOutISOHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
+void USB_CtrlTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
+    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+    int status;
+
+    switch (eventType)
+    {
+    //== TX Packets ==
+    case XUSBPS_EP_EVENT_DATA_TX:
+        {
+            u8 *buffer;
+            u32 bufferLen;
+            // status = XUsbPs_EpBufferSend(usbDriver, endpointNum, &buffer, &bufferLen);
+            break;
+        }
+
+    //== Unhandled Events ==
+    default:
+        break;
+    }
 }
+
+
+u8 RecvBuffer[1024];
+void USB_SynthEventIsoRxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
+{
+    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+
+
+
+    // XUsbPs_EpDataBufferReceive(usbDriver, 1, RecvBuffer, size);
+}
+
+void USB_SynthEventIsoTxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
+{
+    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+
+    u8 buffer[] = "USB test\n";
+    u32 bufferLen = sizeof(buffer);
+    u32 handle;
+    XUsbPs_EpBufferSend(usbDriver, 1, &buffer, &bufferLen);
+}
+
+
+

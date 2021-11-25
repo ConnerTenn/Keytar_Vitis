@@ -56,11 +56,11 @@ void InitUSB()
 
 
     //== Setup Handlers ==
-    status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_IN, USB_CtrlInHandler, &USBdriver);
-    status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_OUT, USB_CtrlOutHandler, &USBdriver);
+    status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_OUT, USB_CtrlRxHandler, &USBdriver);
+    status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_IN, USB_CtrlTxHandler, &USBdriver);
 
-    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_IN, USB_SynthEventInISOHandler);
-    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_OUT, USB_SynthEventOutISOHandler);
+    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_OUT, USB_SynthEventIsoRxHandler);
+    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_IN, USB_SynthEventIsoTxHandler);
 
     //== Setup Interrupts ==
     //Connect the device driver interrupt handler

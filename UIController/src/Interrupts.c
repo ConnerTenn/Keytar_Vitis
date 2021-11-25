@@ -7,7 +7,7 @@ void InitializeInterrupt()
 {
     PRINT("CPU1: Initialize Interrupts\n");
 
-    s32 status;
+    int status;
 
     /*== Initalize ==*/
     XScuGic_Config *config = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
