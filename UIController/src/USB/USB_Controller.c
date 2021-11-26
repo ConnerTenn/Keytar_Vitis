@@ -217,6 +217,23 @@ u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 
 void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
 {
+    u8 state = InstancePtr->AppData->State;
+    XUsbPs_SetConfigDone(InstancePtr, 0U);
+
+    switch (state) {
+        case XUSBPS_STATE_DEFAULT:
+            break;
+
+        case XUSBPS_STATE_ADDRESS:
+            InstancePtr->AppData->State = XUSBPS_STATE_CONFIGURED;
+            break;
+
+        case XUSBPS_STATE_CONFIGURED:
+            break;
+
+        default:
+            break;
+    }
 }
 
 void XUsbPs_SetConfigurationApp(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
