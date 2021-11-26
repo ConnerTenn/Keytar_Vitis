@@ -5,15 +5,18 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/USB/USB_Controller.c \
-../src/USB/USB_Handlers.c 
+../src/USB/USB_Handlers.c \
+../src/USB/xusbps_ch9.c 
 
 OBJS += \
 ./src/USB/USB_Controller.o \
-./src/USB/USB_Handlers.o 
+./src/USB/USB_Handlers.o \
+./src/USB/xusbps_ch9.o 
 
 C_DEPS += \
 ./src/USB/USB_Controller.d \
-./src/USB/USB_Handlers.d 
+./src/USB/USB_Handlers.d \
+./src/USB/xusbps_ch9.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

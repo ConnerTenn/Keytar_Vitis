@@ -29,7 +29,7 @@
 
 #include "Synth.h"
 
-#define KEYBOARD_PRINT 1
+#define KEYBOARD_PRINT 0//1
 
 #define CPU1STARTADDRREG 0xfffffff0
 #define CPU1IMAGEADR 0x02000000
@@ -257,15 +257,15 @@ int main()
             KEYBOARD_REG = 0;
             // dsb(); //Wait for write to complete
 
-            if (i == 5 && ((dly%10000)>=5000))
-            {
-                keys = keys | 1;
-            }
+            // if (i == 5 && ((dly%10000)>=5000))
+            // {
+            //     keys = keys | 1;
+            // }
 
-            if (i == 3 && ((dly%4000)>=2000))
-            {
-                keys = keys | 1;
-            }
+            // if (i == 3 && ((dly%4000)>=2000))
+            // {
+            //     keys = keys | 1;
+            // }
 
             for (u8 k=0; k<8 && i*8+k<sizeof(KeyState); k++)
             {
