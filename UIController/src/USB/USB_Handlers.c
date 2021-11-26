@@ -7,6 +7,7 @@
 
 void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
+    PRINT("CPU1: USB Ctrl RX Handler\n");
     XUsbPs *usbDriver = (XUsbPs *)callbackRef;
     int status;
 
@@ -47,6 +48,7 @@ void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *da
 
 void USB_CtrlTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
+    PRINT("CPU1: USB Ctrl TX Handler\n");
     XUsbPs *usbDriver = (XUsbPs *)callbackRef;
     int status;
 
@@ -71,6 +73,7 @@ void USB_CtrlTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *da
 u8 RecvBuffer[1024];
 void USB_SynthEventIsoRxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
 {
+    PRINT("CPU1: USB ISO RX Handler\n");
     XUsbPs *usbDriver = (XUsbPs *)callbackRef;
 
 
@@ -80,6 +83,7 @@ void USB_SynthEventIsoRxHandler(void *callbackRef, u32 requestedBytes, u32 bytes
 
 void USB_SynthEventIsoTxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
 {
+    PRINT("CPU1: USB ISO TX Handler\n");
     XUsbPs *usbDriver = (XUsbPs *)callbackRef;
 
     u8 buffer[] = "USB test\n";

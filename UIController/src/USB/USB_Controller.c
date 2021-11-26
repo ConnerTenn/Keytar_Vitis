@@ -76,14 +76,18 @@ void InitUSB()
     PRINT("CPU1: Initialize USB\n");
 
     //== Initialize ==
+    PRINT("CPU1: XUsbPs_LookupConfig\n");
     Usb_Config *config = XUsbPs_LookupConfig(XPAR_PS7_USB_0_DEVICE_ID);
     if (config == NULL) { PRINT(TERM_RED"CPU1: ERROR: Failed to find USB config\n"TERM_RESET); }
 
+
+    PRINT("CPU1: XUsbPs_CfgInitialize\n");
     int status;
     status = XUsbPs_CfgInitialize(&USBdriver, config, config->BaseAddress);
     if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
 
 
+    PRINT("CPU1: Setup Endpoints\n");
     //== Setup Endpoints ==
     //Control
     USBconfig.EpCfg[0] = (XUsbPs_EpConfig){
@@ -111,11 +115,13 @@ void InitUSB()
 
     USBconfig.DMAMemPhys = (u32)DMAmemory;
 
+    PRINT("CPU1: XUsbPs_ConfigureDevice\n");
     status = XUsbPs_ConfigureDevice(&USBdriver, &USBconfig);
     if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to configure USB driver\n"TERM_RESET); }
 
 
     //== Setup Handlers ==
+    PRINT("CPU1: Setup Handlers\n");
     status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_OUT, USB_CtrlRxHandler, &USBdriver);
     status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_IN, USB_CtrlTxHandler, &USBdriver);
 
@@ -123,11 +129,14 @@ void InitUSB()
     status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_IN, USB_SynthEventIsoTxHandler);
 
     //== Setup Interrupts ==
+    PRINT("CPU1: InterruptAttach\n");
     //Connect the device driver interrupt handler
     InterruptAttach(XPAR_XUSBPS_0_INTR, XUsbPs_IntrHandler, &USBdriver);
+    PRINT("CPU1: XUsbPs_IntrEnable\n");
     XUsbPs_IntrEnable(&USBdriver, XUSBPS_IXR_UR_MASK | XUSBPS_IXR_UI_MASK);
 
     //== Start ==
+    PRINT("CPU1: XUsbPs_Start\n");
     XUsbPs_Start(&USBdriver);
 
     PRINT("CPU1: USB Initialized\n");
@@ -137,6 +146,8 @@ void InitUSB()
 
 void XUsbPs_ClassReq(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
 {
+    PRINT("CPU1: XUsbPs_ClassReq\n");
+
     // s32 Status;
     // u8 Error = 0;
     // u32 ReplyLen;
@@ -152,6 +163,8 @@ void XUsbPs_ClassReq(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
 
 u32 XUsbPs_Ch9SetupDevDescReply(u8 *bufPtr, u32 bufLen)
 {
+    PRINT("CPU1: XUsbPs_Ch9SetupDevDescReply\n");
+
     /* Check buffer pointer is there and buffer is big enough. */
     if (!bufPtr) { return 0; }
     if (bufLen < sizeof(USB_STD_DEV_DESC)) { return 0; }
@@ -163,6 +176,8 @@ u32 XUsbPs_Ch9SetupDevDescReply(u8 *bufPtr, u32 bufLen)
 
 u32 XUsbPs_Ch9SetupCfgDescReply(u8 *bufPtr, u32 bufLen)
 {
+    PRINT("CPU1: XUsbPs_Ch9SetupCfgDescReply\n");
+
     /* Check buffer pointer is OK and buffer is big enough. */
     if (!bufPtr) { return 0; }
     if (bufLen < sizeof(USB_STD_CFG_DESC)) { return 0; }
@@ -174,6 +189,8 @@ u32 XUsbPs_Ch9SetupCfgDescReply(u8 *bufPtr, u32 bufLen)
 
 u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 {
+    PRINT("CPU1: XUsbPs_Ch9SetupStrDescReply\n");
+
     u8 buffer[128];
     //Assign to buffer because of dynamic sized element
     USB_STD_STRING_DESC *stringDesc = (USB_STD_STRING_DESC *)buffer;
@@ -217,6 +234,9 @@ u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 
 void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
 {
+    PRINT("CPU1: XUsbPs_SetConfiguration\n");
+
+
     u8 state = InstancePtr->AppData->State;
     XUsbPs_SetConfigDone(InstancePtr, 0U);
 
@@ -238,9 +258,13 @@ void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
 
 void XUsbPs_SetConfigurationApp(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
 {
+    PRINT("CPU1: XUsbPs_SetConfigurationApp\n");
+
 }
 
 void XUsbPs_SetInterfaceHandler(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)
 {
+    PRINT("CPU1: XUsbPs_SetInterfaceHandler\n");
+
 }
 
