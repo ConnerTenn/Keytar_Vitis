@@ -9,7 +9,7 @@
 XUsbPs USBdriver;
 XUsbPs_DeviceConfig USBconfig;
 
-u8 DMAmemory[1024] ALIGN32;
+u8 DMAmemory[(64 * 1024)] ALIGNMENT_CACHELINE;
 
 
 
@@ -93,7 +93,7 @@ void InitUSB()
         .Out.MaxPacketSize = 64,
         .In.Type = XUSBPS_EP_TYPE_CONTROL,
         .In.NumBufs = 2,
-        .In.MaxPacketSize = 6,
+        .In.MaxPacketSize = 64,
     };
 
     //Synth Events
@@ -112,7 +112,7 @@ void InitUSB()
     USBconfig.DMAMemPhys = (u32)DMAmemory;
 
     status = XUsbPs_ConfigureDevice(&USBdriver, &USBconfig);
-    if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to initialize USB driver\n"TERM_RESET); }
+    if (status != XST_SUCCESS) { PRINT(TERM_RED"CPU1: ERROR: Failed to configure USB driver\n"TERM_RESET); }
 
 
     //== Setup Handlers ==
