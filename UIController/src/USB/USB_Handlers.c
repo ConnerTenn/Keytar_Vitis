@@ -2,6 +2,7 @@
 #include "USB_Handlers.h"
 
 #include "xusbps.h"
+#include "xusbps_ch9.h"
 
 
 
@@ -49,47 +50,60 @@ void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *da
 void USB_CtrlTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
     PRINT("CPU1: USB Ctrl TX Handler\n");
-    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
-    int status;
+    // XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+    // int status;
 
-    switch (eventType)
-    {
-    //== TX Packets ==
-    case XUSBPS_EP_EVENT_DATA_TX:
-        {
-            u8 *buffer;
-            u32 bufferLen;
-            // status = XUsbPs_EpBufferSend(usbDriver, endpointNum, &buffer, &bufferLen);
-            break;
-        }
+    // switch (eventType)
+    // {
+    // //== TX Packets ==
+    // case XUSBPS_EP_EVENT_DATA_TX:
+    //     {
+    //         u8 *buffer;
+    //         u32 bufferLen;
+    //         // status = XUsbPs_EpBufferSend(usbDriver, endpointNum, &buffer, &bufferLen);
+    //         break;
+    //     }
 
-    //== Unhandled Events ==
-    default:
-        break;
-    }
+    // //== Unhandled Events ==
+    // default:
+    //     break;
+    // }
 }
 
 
-u8 RecvBuffer[1024];
-void USB_SynthEventIsoRxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
+// u8 RecvBuffer[1024];
+void USB_SynthEventRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
 {
-    PRINT("CPU1: USB ISO RX Handler\n");
+    PRINT("CPU1: USB RX Handler\n");
     XUsbPs *usbDriver = (XUsbPs *)callbackRef;
 
-
-
-    // XUsbPs_EpDataBufferReceive(usbDriver, 1, RecvBuffer, size);
-}
-
-void USB_SynthEventIsoTxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed)
-{
-    PRINT("CPU1: USB ISO TX Handler\n");
-    XUsbPs *usbDriver = (XUsbPs *)callbackRef;
-
-    u8 buffer[] = "USB test\n";
-    u32 bufferLen = sizeof(buffer);
+    u8 *buffer;
+    u32 bufferLen;
     u32 handle;
+    int status = XUsbPs_EpBufferReceive(usbDriver, 1, &buffer, &bufferLen, &handle);
+
+    if (status != XST_SUCCESS) { PRINT("  `- Failed to Receive"); return; }
+
+    PRINT("  [%d]>", bufferLen);
+    for (int i=0; i<bufferLen; i++)
+    {
+        PRINT("%c",buffer[i]);
+    }
+    PRINT("<\n");
+
     XUsbPs_EpBufferSend(usbDriver, 1, (const u8 *)buffer, bufferLen);
+    XUsbPs_EpBufferRelease(handle);
+}
+
+void USB_SynthEventTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data)
+{
+    PRINT("CPU1: USB TX Handler\n");
+    // XUsbPs *usbDriver = (XUsbPs *)callbackRef;
+
+    // u8 buffer[] = "USB test\n";
+    // u32 bufferLen = sizeof(buffer);
+    // u32 handle;
+    // XUsbPs_EpBufferSend(usbDriver, 1, (const u8 *)buffer, bufferLen);
 }
 
 

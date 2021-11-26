@@ -62,17 +62,17 @@ USB_CONFIG __attribute__ ((aligned(16))) USBConfig = {
         sizeof(USB_STD_EP_DESC),        /* bLength */
         XUSBPS_TYPE_ENDPOINT_CFG_DESC,  /* bDescriptorType */
         0x00 | 0x01,                    /* bEndpointAddress (Out Endpoint: 1) */
-        XUSBPS_EP_ISOCHRONOUS,          /* bmAttribute  */
+        XUSBPS_EP_BULK,                 /* bmAttribute  */
         512,                            /* wMaxPacketSize */
-        200                             /* bInterval (ms) */
+        0                               /* bInterval */
     },
     {//Endpoint Config   https://studfile.net/preview/305397/page:56/#205
         sizeof(USB_STD_EP_DESC),        /* bLength */
         XUSBPS_TYPE_ENDPOINT_CFG_DESC,  /* bDescriptorType */
         0x80 | 0x01,                    /* bEndpointAddress (In Endpoint: 1) */
-        XUSBPS_EP_ISOCHRONOUS,          /* bmAttribute  */
+        XUSBPS_EP_BULK,                 /* bmAttribute  */
         512,                            /* wMaxPacketSize */
-        200                             /* bInterval (ms) */
+        0                               /* bInterval */
     }
 };
 
@@ -118,11 +118,11 @@ void InitUSB()
 
     //Synth Events
     USBconfig.EpCfg[1] = (XUsbPs_EpConfig){
-        .Out.Type = XUSBPS_EP_TYPE_ISOCHRONOUS,
+        .Out.Type = XUSBPS_EP_TYPE_BULK,
         .Out.NumBufs = 16,
         .Out.BufSize = 512,
         .Out.MaxPacketSize = 512,
-        .In.Type = XUSBPS_EP_TYPE_ISOCHRONOUS,
+        .In.Type = XUSBPS_EP_TYPE_BULK,
         .In.NumBufs = 16,
         .In.MaxPacketSize = 512,
     };
@@ -141,8 +141,8 @@ void InitUSB()
     status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_OUT, USB_CtrlRxHandler, &USBdriver);
     status = XUsbPs_EpSetHandler(&USBdriver, 0, XUSBPS_EP_DIRECTION_IN, USB_CtrlTxHandler, &USBdriver);
 
-    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_OUT, USB_SynthEventIsoRxHandler);
-    status = XUsbPs_EpSetIsoHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_IN, USB_SynthEventIsoTxHandler);
+    status = XUsbPs_EpSetHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_OUT, USB_SynthEventRxHandler, &USBdriver);
+    status = XUsbPs_EpSetHandler(&USBdriver, 1, XUSBPS_EP_DIRECTION_IN, USB_SynthEventTxHandler, &USBdriver);
 
     //== Setup Interrupts ==
     PRINT("CPU1: InterruptAttach\n");
@@ -251,6 +251,20 @@ u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
 {
     PRINT("CPU1: XUsbPs_SetConfiguration [%d]\n", ConfigIdx);
+
+    XUsbPs_EpEnable(InstancePtr, 1, XUSBPS_EP_DIRECTION_OUT);
+	XUsbPs_EpEnable(InstancePtr, 1, XUSBPS_EP_DIRECTION_IN);
+
+	/* Set BULK mode for both directions.  */
+	XUsbPs_SetBits(InstancePtr, XUSBPS_EPCR1_OFFSET,
+						XUSBPS_EPCR_TXT_BULK_MASK |
+						XUSBPS_EPCR_RXT_BULK_MASK |
+						XUSBPS_EPCR_TXR_MASK |
+						XUSBPS_EPCR_RXR_MASK);
+
+	/* Prime the OUT endpoint. */
+	XUsbPs_EpPrime(InstancePtr, 1, XUSBPS_EP_DIRECTION_OUT);
+	XUsbPs_EpPrime(InstancePtr, 1, XUSBPS_EP_DIRECTION_IN);
 }
 
 void XUsbPs_SetConfigurationApp(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)

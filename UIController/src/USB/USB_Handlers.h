@@ -5,6 +5,6 @@ void USB_CtrlRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *da
 void USB_CtrlTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data);
 
 
-void USB_SynthEventIsoRxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed);
-void USB_SynthEventIsoTxHandler(void *callbackRef, u32 requestedBytes, u32 bytesTXed);
+void USB_SynthEventRxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data);
+void USB_SynthEventTxHandler(void *callbackRef, u8 endpointNum, u8 eventType, void *data);
 
