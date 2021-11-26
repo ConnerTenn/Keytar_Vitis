@@ -9,8 +9,10 @@
 
 typedef struct 
 {
-	USB_STD_CFG_DESC  stdCfg;
-	USB_STD_IF_DESC   ifCfg;
+    USB_STD_CFG_DESC  stdCfg;
+    USB_STD_IF_DESC   ifCfg;
+    USB_STD_EP_DESC   epCfg1;
+    USB_STD_EP_DESC   epCfg2;
 } __attribute__((__packed__))USB_CONFIG;
 
 

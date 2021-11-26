@@ -20,6 +20,8 @@
 #include "xil_mmu.h"
 #include "sleep.h"
 
+#include "Interrupts.h"
+
 #include "USB_Controller.h"
 #include "Sil9022.h"
 #include "VideoController.h"

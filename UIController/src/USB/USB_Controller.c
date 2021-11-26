@@ -27,8 +27,8 @@ USB_STD_DEV_DESC __attribute__ ((aligned(16))) USBDeviceDesc = {
     0x10,                      /* bDeviceSubClass */
     0x01,                      /* bDeviceProtocol */
     0x40,                      /* bMaxPackedSize0 */
-    0x03Fd,                    /* idVendor */
-    0x0200,                    /* idProduct */
+    0xE621,                    /* idVendor */
+    0xE926,                    /* idProduct */
     0x0100,                    /* bcdDevice */
     0x01,                      /* iManufacturer */
     0x02,                      /* iProduct */
@@ -37,27 +37,43 @@ USB_STD_DEV_DESC __attribute__ ((aligned(16))) USBDeviceDesc = {
 };
 
 USB_CONFIG __attribute__ ((aligned(16))) USBConfig = {
-    {/* Std Config*/
+    {//Std Config   https://studfile.net/preview/305397/page:55/#203
         sizeof(USB_STD_CFG_DESC),  /* bLength */
         XUSBPS_TYPE_CONFIG_DESC,   /* bDescriptorType */
         sizeof(USB_CONFIG),        /* wTotalLength */
         0x01,                      /* Num interfaces */
-        0x01,                      /* Num configuration values */
-        0x00,                      /* Configuration string */
+        0x01,                      /* bConfigurationValue (value to select config) */
+        0x04,                      /* Configuration string idx*/
         0xC0,                      /* bmAttribute */
-        0x01                       /* bMaxPower */
+        0x64                       /* bMaxPower (=200mA)*/
     },
-    {/* Interface Config */
+    {//Interface Config   https://studfile.net/preview/305397/page:56/
         sizeof(USB_STD_IF_DESC),  /* Interface Descriptor size 9 bytes */
         XUSBPS_TYPE_IF_CFG_DESC,  /* This is an interface descriptor */
         0x00,                     /* Interface number 0 */
         0x00,                     /* Alternate set 0 */
-        0x01,                     /* Number of end points */
-        XUSBPS_CLASS_VENDOR,      /* Audio device */
-        0xE6,                     /* Audio Control */
-        0x21,                     /* Interface Protocol */
-        0x00                      /* iInterface */
+        0x02,                     /* Number of end points */
+        XUSBPS_CLASS_VENDOR,      /* bInterfaceClass */
+        0x11,                     /* bInterfaceSubClass */
+        0x69,                     /* bInterfaceProtocol  */
+        0x05                      /* Interface string idx */
     },
+    {//Endpoint Config   https://studfile.net/preview/305397/page:56/#205
+        sizeof(USB_STD_EP_DESC),        /* bLength */
+        XUSBPS_TYPE_ENDPOINT_CFG_DESC,  /* bDescriptorType */
+        0x00 | 0x01,                    /* bEndpointAddress (Out Endpoint: 1) */
+        XUSBPS_EP_ISOCHRONOUS,          /* bmAttribute  */
+        512,                            /* wMaxPacketSize */
+        200                             /* bInterval (ms) */
+    },
+    {//Endpoint Config   https://studfile.net/preview/305397/page:56/#205
+        sizeof(USB_STD_EP_DESC),        /* bLength */
+        XUSBPS_TYPE_ENDPOINT_CFG_DESC,  /* bDescriptorType */
+        0x80 | 0x01,                    /* bEndpointAddress (In Endpoint: 1) */
+        XUSBPS_EP_ISOCHRONOUS,          /* bmAttribute  */
+        512,                            /* wMaxPacketSize */
+        200                             /* bInterval (ms) */
+    }
 };
 
 char *StringList[] = {
@@ -104,11 +120,11 @@ void InitUSB()
     USBconfig.EpCfg[1] = (XUsbPs_EpConfig){
         .Out.Type = XUSBPS_EP_TYPE_ISOCHRONOUS,
         .Out.NumBufs = 16,
-        .Out.BufSize = 1024,
-        .Out.MaxPacketSize = 64,
+        .Out.BufSize = 512,
+        .Out.MaxPacketSize = 512,
         .In.Type = XUSBPS_EP_TYPE_ISOCHRONOUS,
         .In.NumBufs = 16,
-        .In.MaxPacketSize = 64,
+        .In.MaxPacketSize = 512,
     };
 
     USBconfig.NumEndpoints = 2;
@@ -234,26 +250,7 @@ u32 XUsbPs_Ch9SetupStrDescReply(u8 *bufPtr, u32 bufLen, u8 index)
 
 void XUsbPs_SetConfiguration(XUsbPs *InstancePtr, int ConfigIdx)
 {
-    PRINT("CPU1: XUsbPs_SetConfiguration\n");
-
-
-    u8 state = InstancePtr->AppData->State;
-    XUsbPs_SetConfigDone(InstancePtr, 0U);
-
-    switch (state) {
-        case XUSBPS_STATE_DEFAULT:
-            break;
-
-        case XUSBPS_STATE_ADDRESS:
-            InstancePtr->AppData->State = XUSBPS_STATE_CONFIGURED;
-            break;
-
-        case XUSBPS_STATE_CONFIGURED:
-            break;
-
-        default:
-            break;
-    }
+    PRINT("CPU1: XUsbPs_SetConfiguration [%d]\n", ConfigIdx);
 }
 
 void XUsbPs_SetConfigurationApp(XUsbPs *InstancePtr, XUsbPs_SetupData *SetupData)

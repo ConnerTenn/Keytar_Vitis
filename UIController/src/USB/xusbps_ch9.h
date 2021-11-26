@@ -220,8 +220,7 @@ typedef struct
     u8 bDescriptorType;
     u8 bEndpointAddress;
     u8 bmAttributes;
-    u8 bMaxPacketSizeL;
-    u8 bMaxPacketSizeH;
+    u16 wMaxPacketSize;
     u8 bInterval;
 }  __attribute__((__packed__))USB_STD_EP_DESC;
 
