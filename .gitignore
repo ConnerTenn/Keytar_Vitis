@@ -2,6 +2,8 @@
 #== Directories ==
 /.metadata/
 .vscode/
+ZTurnPlatform/export/
+Synth_system/Debug/
 
 #== File Types ==
 #reports
@@ -20,7 +22,5 @@
 
 #== Files ==
 .analytics
-
-Synth_system/Debug/.Xil/xsa.xml
 
 *.checksum
