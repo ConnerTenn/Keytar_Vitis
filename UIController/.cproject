@@ -63,6 +63,8 @@
                                     									
                                     <listOptionValue builtIn="false" value="${resolvePlatformFile:project=UIController,fileType=bspInclude}"/>
                                     									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/UIController/src/USB}&quot;"/>
+                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/UIController/src/Video}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/UIController/src/Video/lvgl}&quot;"/>

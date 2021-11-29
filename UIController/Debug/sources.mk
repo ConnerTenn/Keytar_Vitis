@@ -16,6 +16,8 @@ ELFSIZE :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+src \
+src/USB \
 src/Video \
 src/Video/lvgl/examples/porting \
 src/Video/lvgl/src/lv_core \
@@ -30,5 +32,4 @@ src/Video/lvgl/tests \
 src/Video/lvgl/tests/lv_test_core \
 src/Video/lvgl/tests/lv_test_fonts \
 src/Video/lvgl/tests/lv_test_widgets \
-src \
 

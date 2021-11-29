@@ -1,7 +1,7 @@
 
 from math import *
 
-d=80
+d=40
 
 #1st coefficient
 sinc=[1/d]
