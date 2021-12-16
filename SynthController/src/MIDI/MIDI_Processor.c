@@ -1,12 +1,10 @@
 
 #include "MIDI.h"
 
-void *StateAddr = 0;
-void *RunAddr = 0;
 
 u8 RunStatus = 0;
 
-u8 ParamStack[32];
+u8 ParamStack[2];
 u8 ParamStackFill = 0;
 
 
@@ -15,143 +13,66 @@ void Midi_ProcessByte(u8 byte)
     if ((byte & 0x80) != 0)
     {
         //Status byte received
+        RunStatus = byte;
 
         //Reset state
         ParamStackFill = 0;
-        StateAddr = 0;
     }
-    else
+    else if (ParamStackFill<sizeof(ParamStack))
     {
         //Push value onto stack
         ParamStack[ParamStackFill++] = byte;
-
-        //== Jump to State ==
-        if (StateAddr)
-        {
-            goto *StateAddr;
-        }
-
-        //== Run Message ==
-        if (RunAddr)
-        {
-            goto *RunAddr;
-        }
     }
 
 
 
     //== Channel Voice Messages ==
+    switch (RunStatus & 0xF0)
+    {
     //Note Off
-    if ((byte & 0xF0) == 0x80)
-    {
-        RunStatus = byte;
-        StateAddr = &&controllerNoteOff1;
-        RunAddr = &&controllerNoteOff1;
-        return;
-controllerNoteOff1:
-        if (byte <= 0x7F)
+    case 0x80:
+        if (ParamStackFill==2)
         {
-            StateAddr = &&controllerNoteOff2;
-            return;
-controllerNoteOff2:
-            if (byte <= 0x7F)
-            {
-                Midi_ChannelNoteOff(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
-                StateAddr = 0; //Reset
-                return;
-            }
-            //Error State (Ignored)
-            return;
+            Midi_ChannelNoteOff(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
+            RunStatus = 0; //Reset
         }
-        //Error State (Ignored)
-        return;
-    }
+        break;
+
     //Note On
-    else if ((byte & 0xF0) == 0x90)
-    {
-        RunStatus = byte;
-        StateAddr = &&ControllerNoteOn1;
-        RunAddr = &&ControllerNoteOn1;
-        return;
-ControllerNoteOn1:
-        if (byte <= 0x7F)
+    case 0x90:
+        if (ParamStackFill==2)
         {
-            StateAddr = &&ControllerNoteOn2;
-ControllerNoteOn2:
-            if (byte <= 0x7F)
-            {
-                Midi_ChannelNoteOn(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
-                return;
-            }
-            //Error State (Ignored)
-            return;
+            Midi_ChannelNoteOn(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
+            RunStatus = 0; //Reset
         }
-        //Error State (Ignored)
-        return;
-    }
+        break;
+
     //Controller Change
-    else if ((byte & 0xF0) == 0xB0)
-    {
-        RunStatus = byte;
-        StateAddr = &&ControllerChange1;
-        RunAddr = &&ControllerChange1;
-        return;
-ControllerChange1:
-        if (byte <= 0x7F)
+    case 0xB0:
+        if (ParamStackFill==2)
         {
-            StateAddr = &&ControllerChange2;
-            return;
-ControllerChange2:
-            if (byte <= 0x7F)
-            {
-                Midi_ChannelControllerChange(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
-                return;
-            }
-            //Error State (Ignored)
-            return;
+            Midi_ChannelControllerChange(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
+            RunStatus = 0; //Reset
         }
-        //Error State (Ignored)
-        return;
-    }
+        break;
+
     //Program Change
-    else if ((byte & 0xF0) == 0xC0)
-    {
-        RunStatus = byte;
-        StateAddr = &&ProgramChange1;
-        RunAddr = &&ProgramChange1;
-        return;
-ProgramChange1:
-        if (byte <= 0x7F)
+    case 0xC0:
+        if (ParamStackFill==1)
         {
             Midi_ChannelProgramChange(RunStatus&0x0F, ParamStack[0]);
-            return;
+            RunStatus = 0; //Reset
         }
-        //Error State (Ignored)
-        return;
-    }
+        break;
+
     //Pitch Bend
-    else if ((byte & 0xF0) == 0xE0)
-    {
-        RunStatus = byte;
-        StateAddr = &&PitchBend1;
-        RunAddr = &&PitchBend1;
-        return;
-PitchBend1:
-        if (byte <= 0x7F)
+    case 0xE0:
+        if (ParamStackFill==2)
         {
-            StateAddr = &&PitchBend2;
-            return;
-PitchBend2:
-            if (byte <= 0x7F)
-            {
-                Midi_ChannelPitchBend(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
-                return;
-            }
-            //Error State (Ignored)
-            return;
+            Midi_ChannelPitchBend(RunStatus&0x0F, ParamStack[0], ParamStack[1]);
+            RunStatus = 0; //Reset
         }
-        //Error State (Ignored)
-        return;
+        break;
     }
 }
 
